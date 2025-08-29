@@ -1768,3 +1768,515 @@
             document.getElementById('dashTotContratti').textContent = totaleContratti;
             document.getElementById('dashIncassoMese').textContent = '€ ' + incassoMese.toLocaleString('it-IT', {minimumFractionDigits: 2});
             document.getElementById('dashRicavoMese').textContent = '€ ' + ricavoTotale.toLocaleString('it-IT', {minimumFractionDigits: 2});
+            document.getElementById('dashOnline').textContent = contrattiOnline;
+            document.getElementById('dashVirtual').textContent = contrattiVirtual;
+            document.getElementById('dashStornati').textContent = totaleStornati;
+            document.getElementById('dashValoreStornati').textContent = '€ ' + valoreStornati.toLocaleString('it-IT', {minimumFractionDigits: 2});
+            
+            generateDetailedReport(filtered, month, year);
+        }
+
+        function generateDetailedReport(filtered, month, year) {
+            const monthNames = ['', 'Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 
+                               'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'];
+            
+            if (filtered.length === 0) {
+                document.getElementById('reportContent').innerHTML = `
+                    <div style="background: #f8f9fa; border-radius: 12px; padding: 30px; text-align: center; margin-top: 20px;">
+                        <p style="color: #6c757d;">Nessun contratto trovato per i criteri selezionati</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const venditorData = {};
+            filtered.forEach(c => {
+                if (!venditorData[c.venditore]) {
+                    venditorData[c.venditore] = {
+                        contratti: 0,
+                        incassoMese: 0,
+                        ricavoTotale: 0,
+                        online: 0,
+                        virtual: 0
+                    };
+                }
+                venditorData[c.venditore].contratti += c.numeroContratti;
+                
+                const meseKey = monthNames[month].toLowerCase();
+                venditorData[c.venditore].incassoMese += (c.incassi && c.incassi[meseKey]) ? c.incassi[meseKey] : 0;
+                venditorData[c.venditore].ricavoTotale += c.prezzo;
+                
+                if (c.prodotto === 'ON LINE') venditorData[c.venditore].online++;
+                else if (c.prodotto === 'VIRTUAL') venditorData[c.venditore].virtual++;
+            });
+
+            const totali = {
+                contratti: 0,
+                incassoMese: 0,
+                ricavoTotale: 0,
+                online: 0,
+                virtual: 0
+            };
+
+            Object.values(venditorData).forEach(v => {
+                totali.contratti += v.contratti;
+                totali.incassoMese += v.incassoMese;
+                totali.ricavoTotale += v.ricavoTotale;
+                totali.online += v.online;
+                totali.virtual += v.virtual;
+            });
+
+            const sortedVenditori = Object.entries(venditorData).sort((a, b) => b[1].ricavoTotale - a[1].ricavoTotale);
+
+            const html = `
+                <div style="margin-top: 30px;">
+                    <h3 style="margin-bottom: 20px;">📊 Report Dettaglio Venditori - ${monthNames[month]} ${year}</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Venditore</th>
+                                <th>N° Contratti</th>
+                                <th>Incasso ${monthNames[month]}</th>
+                                <th>Ricavo Totale</th>
+                                <th>Media Incasso</th>
+                                <th>Media/Contratto</th>
+                                <th>% Incasso</th>
+                                <th>Online/Virtual</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${sortedVenditori.map(([nome, data], index) => {
+                                const percIncasso = data.ricavoTotale ? ((data.incassoMese / data.ricavoTotale) * 100) : 0;
+                                const medal = index === 0 ? '🥇 ' : index === 1 ? '🥈 ' : index === 2 ? '🥉 ' : '';
+                                return `
+                                    <tr style="${index < 3 ? 'background: #fffbf0;' : ''}">
+                                        <td><strong>${medal}${nome}</strong></td>
+                                        <td>${data.contratti}</td>
+                                        <td>€ ${data.incassoMese.toLocaleString('it-IT', {minimumFractionDigits: 2})}</td>
+                                        <td>€ ${data.ricavoTotale.toLocaleString('it-IT', {minimumFractionDigits: 2})}</td>
+                                        <td>€ ${data.contratti ? (data.incassoMese / data.contratti).toLocaleString('it-IT', {minimumFractionDigits: 2}) : '0,00'}</td>
+                                        <td>€ ${data.contratti ? (data.ricavoTotale / data.contratti).toLocaleString('it-IT', {minimumFractionDigits: 2}) : '0,00'}</td>
+                                        <td><strong>${percIncasso.toFixed(2)}%</strong></td>
+                                        <td>${data.online}/${data.virtual}</td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                        <tfoot>
+                            <tr style="background: #f8f9fa; font-weight: bold;">
+                                <td>TOTALE</td>
+                                <td>${totali.contratti}</td>
+                                <td>€ ${totali.incassoMese.toLocaleString('it-IT', {minimumFractionDigits: 2})}</td>
+                                <td>€ ${totali.ricavoTotale.toLocaleString('it-IT', {minimumFractionDigits: 2})}</td>
+                                <td>€ ${totali.contratti ? (totali.incassoMese / totali.contratti).toLocaleString('it-IT', {minimumFractionDigits: 2}) : '0,00'}</td>
+                                <td>€ ${totali.contratti ? (totali.ricavoTotale / totali.contratti).toLocaleString('it-IT', {minimumFractionDigits: 2}) : '0,00'}</td>
+                                <td>${totali.ricavoTotale ? ((totali.incassoMese / totali.ricavoTotale) * 100).toFixed(2) : '0,00'}%</td>
+                                <td>${totali.online}/${totali.virtual}</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            `;
+
+            document.getElementById('reportContent').innerHTML = html;
+        }
+
+        function generateAnalytics() {
+            updateVenditoriSelect();
+            
+            const oggi = new Date();
+            const primoGiornoMeseCorrente = new Date(oggi.getFullYear(), oggi.getMonth(), 1);
+            const ultimoGiornoMeseCorrente = new Date(oggi.getFullYear(), oggi.getMonth() + 1, 0);
+            const primoGiornoMesePrecedente = new Date(oggi.getFullYear(), oggi.getMonth() - 1, 1);
+            const ultimoGiornoMesePrecedente = new Date(oggi.getFullYear(), oggi.getMonth(), 0);
+            
+            const periodo1Dal = document.getElementById('periodo1Dal');
+            const periodo1Al = document.getElementById('periodo1Al');
+            const periodo2Dal = document.getElementById('periodo2Dal');
+            const periodo2Al = document.getElementById('periodo2Al');
+            
+            if (periodo1Dal && !periodo1Dal.value) {
+                periodo1Dal.valueAsDate = primoGiornoMesePrecedente;
+            }
+            if (periodo1Al && !periodo1Al.value) {
+                periodo1Al.valueAsDate = ultimoGiornoMesePrecedente;
+            }
+            if (periodo2Dal && !periodo2Dal.value) {
+                periodo2Dal.valueAsDate = primoGiornoMeseCorrente;
+            }
+            if (periodo2Al && !periodo2Al.value) {
+                periodo2Al.valueAsDate = oggi;
+            }
+            
+            document.getElementById('analyticsNoData').style.display = 'block';
+            document.getElementById('comparativeStats').style.display = 'none';
+            document.getElementById('chartsContainer').style.display = 'none';
+        }
+
+        function updateAnalytics() {
+            const periodo1Dal = document.getElementById('periodo1Dal').value;
+            const periodo1Al = document.getElementById('periodo1Al').value;
+            const periodo2Dal = document.getElementById('periodo2Dal').value;
+            const periodo2Al = document.getElementById('periodo2Al').value;
+            
+            if (!periodo1Dal || !periodo1Al || !periodo2Dal || !periodo2Al) {
+                document.getElementById('analyticsNoData').style.display = 'block';
+                document.getElementById('comparativeStats').style.display = 'none';
+                document.getElementById('chartsContainer').style.display = 'none';
+                return;
+            }
+            
+            document.getElementById('analyticsNoData').style.display = 'none';
+            document.getElementById('comparativeStats').style.display = 'block';
+            document.getElementById('chartsContainer').style.display = 'block';
+            
+            const venditore1 = document.getElementById('analyticsVenditore1').value;
+            let contratti1 = contracts.filter(c => {
+                const dataOrdine = new Date(c.dataOrdine);
+                return dataOrdine >= new Date(periodo1Dal) && dataOrdine <= new Date(periodo1Al);
+            });
+            
+            if (venditore1) {
+                contratti1 = contratti1.filter(c => c.venditore === venditore1);
+            }
+            
+            const venditore2 = document.getElementById('analyticsVenditore2').value;
+            let contratti2 = contracts.filter(c => {
+                const dataOrdine = new Date(c.dataOrdine);
+                return dataOrdine >= new Date(periodo2Dal) && dataOrdine <= new Date(periodo2Al);
+            });
+            
+            if (venditore2) {
+                contratti2 = contratti2.filter(c => c.venditore === venditore2);
+            }
+            
+            const stats1 = calcolaStatistiche(contratti1);
+            const stats2 = calcolaStatistiche(contratti2);
+            
+            document.getElementById('statsPeriodo1Contratti').textContent = stats1.totaleContratti;
+            document.getElementById('statsPeriodo1Valore').textContent = '€ ' + stats1.totaleValore.toLocaleString('it-IT', {minimumFractionDigits: 2});
+            document.getElementById('statsPeriodo2Contratti').textContent = stats2.totaleContratti;
+            document.getElementById('statsPeriodo2Valore').textContent = '€ ' + stats2.totaleValore.toLocaleString('it-IT', {minimumFractionDigits: 2});
+            
+            generaTabellaComparativa(stats1, stats2);
+        }
+
+        function calcolaStatistiche(contratti) {
+            const validi = contratti.filter(c => !c.stornato);
+            const stornati = contratti.filter(c => c.stornato);
+            
+            return {
+                totaleContratti: validi.reduce((sum, c) => sum + c.numeroContratti, 0),
+                totaleValore: validi.reduce((sum, c) => sum + c.prezzo, 0),
+                online: validi.filter(c => c.prodotto === 'ON LINE').length,
+                virtual: validi.filter(c => c.prodotto === 'VIRTUAL').length,
+                stornati: stornati.length,
+                valoreStornati: stornati.reduce((sum, c) => sum + c.prezzo, 0)
+            };
+        }
+
+        function generaTabellaComparativa(stats1, stats2) {
+            const mediaValore1 = stats1.totaleContratti > 0 ? stats1.totaleValore / stats1.totaleContratti : 0;
+            const mediaValore2 = stats2.totaleContratti > 0 ? stats2.totaleValore / stats2.totaleContratti : 0;
+            
+            const diffContratti = stats2.totaleContratti - stats1.totaleContratti;
+            const percDiffContratti = stats1.totaleContratti > 0 ? (diffContratti / stats1.totaleContratti * 100) : 0;
+            
+            const diffValore = stats2.totaleValore - stats1.totaleValore;
+            const percDiffValore = stats1.totaleValore > 0 ? (diffValore / stats1.totaleValore * 100) : 0;
+            
+            const tableBody = document.getElementById('comparisonTableBody');
+            tableBody.innerHTML = `
+                <tr>
+                    <td>Numero Contratti Validi</td>
+                    <td style="text-align: center;">${stats1.totaleContratti}</td>
+                    <td style="text-align: center;">${stats2.totaleContratti}</td>
+                    <td style="text-align: center; font-weight: bold; color: ${diffContratti >= 0 ? '#28a745' : '#dc3545'}">
+                        ${diffContratti >= 0 ? '+' : ''}${diffContratti} (${percDiffContratti >= 0 ? '+' : ''}${percDiffContratti.toFixed(1)}%)
+                    </td>
+                </tr>
+                <tr style="background: #f8f9fa;">
+                    <td>Valore Totale</td>
+                    <td style="text-align: center;">€ ${stats1.totaleValore.toLocaleString('it-IT', {minimumFractionDigits: 2})}</td>
+                    <td style="text-align: center;">€ ${stats2.totaleValore.toLocaleString('it-IT', {minimumFractionDigits: 2})}</td>
+                    <td style="text-align: center; font-weight: bold; color: ${diffValore >= 0 ? '#28a745' : '#dc3545'}">
+                        ${diffValore >= 0 ? '+' : ''}€ ${diffValore.toLocaleString('it-IT', {minimumFractionDigits: 2})} 
+                        (${percDiffValore >= 0 ? '+' : ''}${percDiffValore.toFixed(1)}%)
+                    </td>
+                </tr>
+                <tr>
+                    <td>Valore Medio Contratto</td>
+                    <td style="text-align: center;">€ ${mediaValore1.toLocaleString('it-IT', {minimumFractionDigits: 2})}</td>
+                    <td style="text-align: center;">€ ${mediaValore2.toLocaleString('it-IT', {minimumFractionDigits: 2})}</td>
+                    <td style="text-align: center; font-weight: bold; color: ${mediaValore2 >= mediaValore1 ? '#28a745' : '#dc3545'}">
+                        ${mediaValore2 >= mediaValore1 ? '+' : ''}€ ${(mediaValore2 - mediaValore1).toLocaleString('it-IT', {minimumFractionDigits: 2})}
+                    </td>
+                </tr>
+                <tr style="background: #f8f9fa;">
+                    <td>Contratti Stornati</td>
+                    <td style="text-align: center;">${stats1.stornati}</td>
+                    <td style="text-align: center;">${stats2.stornati}</td>
+                    <td style="text-align: center; font-weight: bold; color: ${stats2.stornati <= stats1.stornati ? '#28a745' : '#dc3545'}">
+                        ${stats2.stornati >= stats1.stornati ? '+' : ''}${stats2.stornati - stats1.stornati}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Prodotti ON LINE</td>
+                    <td style="text-align: center;">${stats1.online}</td>
+                    <td style="text-align: center;">${stats2.online}</td>
+                    <td style="text-align: center; font-weight: bold; color: ${stats2.online >= stats1.online ? '#28a745' : '#dc3545'}">
+                        ${stats2.online >= stats1.online ? '+' : ''}${stats2.online - stats1.online}
+                    </td>
+                </tr>
+                <tr style="background: #f8f9fa;">
+                    <td>Prodotti VIRTUAL</td>
+                    <td style="text-align: center;">${stats1.virtual}</td>
+                    <td style="text-align: center;">${stats2.virtual}</td>
+                    <td style="text-align: center; font-weight: bold; color: ${stats2.virtual >= stats1.virtual ? '#28a745' : '#dc3545'}">
+                        ${stats2.virtual >= stats1.virtual ? '+' : ''}${stats2.virtual - stats1.virtual}
+                    </td>
+                </tr>
+            `;
+        }
+
+        function exportData() {
+            let csv = 'Mese Produzione;Data Ingresso;Data Ordine;Venditore;Prodotto;Nome;Cognome;Prezzo;Rateizzazione;Num Contratti;';
+            csv += 'Incasso Gen;Incasso Feb;Incasso Mar;Incasso Apr;Incasso Mag;Incasso Giu;';
+            csv += 'Incasso Lug;Incasso Ago;Incasso Set;Incasso Ott;Incasso Nov;Incasso Dic\n';
+            
+            const mesi = ['gennaio', 'febbraio', 'marzo', 'aprile', 'maggio', 'giugno',
+                         'luglio', 'agosto', 'settembre', 'ottobre', 'novembre', 'dicembre'];
+            
+            contracts.forEach(c => {
+                csv += `${c.meseProduzione};${c.dataIngresso};${c.dataOrdine};${c.venditore};${c.prodotto};`;
+                csv += `${c.nomeStudente};${c.cognomeStudente};${c.prezzo};${c.rateizzazione};${c.numeroContratti};`;
+                
+                mesi.forEach(mese => {
+                    csv += `${c.incassi && c.incassi[mese] ? c.incassi[mese] : ''};`;
+                });
+                csv += '\n';
+            });
+
+            const BOM = '\uFEFF';
+            const blob = new Blob([BOM + csv], { type: 'text/csv;charset=utf-8;' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `contratti_pronto_diploma_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            
+            showNotification('📥 Export completato!');
+        }
+
+        // Funzioni importazione Excel
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            document.getElementById('dropZone').style.background = '#f0f0f0';
+        }
+
+        function handleDragLeave(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            document.getElementById('dropZone').style.background = 'white';
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            document.getElementById('dropZone').style.background = 'white';
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                processExcelFile(files[0]);
+            }
+        }
+
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (file) {
+                processExcelFile(file);
+            }
+        }
+
+        function processExcelFile(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = e.target.result;
+                    const workbook = XLSX.read(data, {type: 'binary', cellDates: true});
+                    
+                    tempImportData = [];
+                    const monthMapping = {
+                        'GENNAIO': '01', 'FEBBRAIO': '02', 'MARZO': '03', 'APRILE': '04',
+                        'MAGGIO': '05', 'GIUGNO': '06', 'LUGLIO': '07', 'AGOSTO': '08',
+                        'SETTEMBRE': '09', 'OTTOBRE': '10', 'NOVEMBRE': '11', 'DICEMBRE': '12'
+                    };
+                    
+                    workbook.SheetNames.forEach(sheetName => {
+                        const worksheet = workbook.Sheets[sheetName];
+                        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+                        
+                        let meseProduzione = '';
+                        const sheetParts = sheetName.toUpperCase().split(' ');
+                        if (sheetParts.length >= 2) {
+                            const monthName = sheetParts[0];
+                            const year = sheetParts[1];
+                            if (monthMapping[monthName] && year) {
+                                meseProduzione = `${year}-${monthMapping[monthName]}`;
+                            }
+                        }
+                        
+                        jsonData.forEach(row => {
+                            if (!row['SALES'] || !row['Prezzo']) return;
+                            
+                            let nomeCompleto = row['Membro / Referente'] || '';
+                            let [cognome, nome] = nomeCompleto.split(' ').length > 1 
+                                ? [nomeCompleto.substring(0, nomeCompleto.lastIndexOf(' ')), nomeCompleto.substring(nomeCompleto.lastIndexOf(' ') + 1)]
+                                : [nomeCompleto, ''];
+                            
+                            let dataIngresso = '';
+                            let dataOrdine = '';
+                            
+                            if (row['INGRESSO LEAD']) {
+                                const dateObj = new Date(row['INGRESSO LEAD']);
+                                if (!isNaN(dateObj)) {
+                                    dataIngresso = dateObj.toISOString().split('T')[0];
+                                }
+                            }
+                            
+                            if (row['Data ordine']) {
+                                const dateObj = new Date(row['Data ordine']);
+                                if (!isNaN(dateObj)) {
+                                    dataOrdine = dateObj.toISOString().split('T')[0];
+                                }
+                            }
+                            
+                            let rateizzazione = 'Bonifico';
+                            const rateValue = row['Rateizzato'];
+                            if (rateValue) {
+                                if (rateValue.toString().includes('SELLA')) rateizzazione = 'Banca Sella Prestito al Consumo';
+                                else if (rateValue.toString().includes('ACCONTO')) rateizzazione = 'Acconto + Link To Pay';
+                            }
+                            
+                            const incassi = {};
+                            const monthNames = ['GENNAIO', 'FEBBRAIO', 'MARZO', 'APRILE', 'MAGGIO', 'GIUGNO',
+                                              'LUGLIO', 'AGOSTO', 'SETTEMBRE', 'OTTOBRE', 'NOVEMBRE', 'DICEMBRE'];
+                            const monthKeys = ['gennaio', 'febbraio', 'marzo', 'aprile', 'maggio', 'giugno',
+                                             'luglio', 'agosto', 'settembre', 'ottobre', 'novembre', 'dicembre'];
+                            
+                            monthNames.forEach((month, idx) => {
+                                const value = row[`INCASSO ${month}`];
+                                if (value && !isNaN(value) && parseFloat(value) > 0) {
+                                    incassi[monthKeys[idx]] = parseFloat(value);
+                                }
+                            });
+                            
+                            const contract = {
+                                meseProduzione: meseProduzione || '2025-01',
+                                dataIngresso: dataIngresso,
+                                dataOrdine: dataOrdine,
+                                venditore: row['SALES'].toString().toUpperCase(),
+                                prodotto: row['Prodotto'] && row['Prodotto'].toString().toUpperCase().includes('VIRTUAL') ? 'VIRTUAL' : 'ON LINE',
+                                nomeStudente: nome,
+                                cognomeStudente: cognome,
+                                prezzo: parseFloat(row['Prezzo']) || 0,
+                                rateizzazione: rateizzazione,
+                                numeroContratti: parseInt(row['N CTR']) || 1,
+                                incassi: incassi
+                            };
+                            
+                            tempImportData.push(contract);
+                        });
+                    });
+                    
+                    showImportPreview(tempImportData, file.name);
+                } catch (error) {
+                    alert('Errore nella lettura del file: ' + error.message);
+                    console.error(error);
+                }
+            };
+            
+            reader.readAsBinaryString(file);
+        }
+
+        function showImportPreview(data, filename) {
+            const previewDiv = document.getElementById('importPreview');
+            const previewInfo = document.getElementById('previewInfo');
+            const previewTable = document.getElementById('previewTable');
+            
+            const venditoriSet = new Set(data.map(c => c.venditore));
+            const mesiSet = new Set(data.map(c => c.meseProduzione));
+            
+            previewInfo.innerHTML = `
+                <strong>📄 File:</strong> ${filename}<br>
+                <strong>📊 Totale contratti da importare:</strong> ${data.length}<br>
+                <strong>👥 Venditori trovati:</strong> ${venditoriSet.size} (${[...venditoriSet].join(', ')})<br>
+                <strong>📅 Mesi produzione:</strong> ${[...mesiSet].map(m => {
+                    const [year, month] = m.split('-');
+                    const monthNames = ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic'];
+                    return `${monthNames[parseInt(month)-1]} ${year}`;
+                }).join(', ')}
+            `;
+            
+            let tableHtml = `
+                <thead>
+                    <tr>
+                        <th>Mese Prod.</th>
+                        <th>Venditore</th>
+                        <th>Studente</th>
+                        <th>Prodotto</th>
+                        <th>Prezzo</th>
+                        <th>Rate</th>
+                    </tr>
+                </thead>
+                <tbody>
+            `;
+            
+            data.slice(0, 10).forEach(c => {
+                const [year, month] = c.meseProduzione.split('-');
+                const monthNames = ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic'];
+                const meseProd = `${monthNames[parseInt(month)-1]} ${year}`;
+                
+                tableHtml += `
+                    <tr>
+                        <td>${meseProd}</td>
+                        <td>${c.venditore}</td>
+                        <td>${c.nomeStudente} ${c.cognomeStudente}</td>
+                        <td>${c.prodotto}</td>
+                        <td>€ ${c.prezzo.toFixed(2)}</td>
+                        <td>${c.rateizzazione}</td>
+                    </tr>
+                `;
+            });
+            
+            if (data.length > 10) {
+                tableHtml += `
+                    <tr>
+                        <td colspan="6" style="text-align: center; font-style: italic; color: #666;">
+                            ... e altri ${data.length - 10} contratti
+                        </td>
+                    </tr>
+                `;
+            }
+            
+            tableHtml += '</tbody>';
+            previewTable.innerHTML = tableHtml;
+            
+            previewDiv.style.display = 'block';
+            document.getElementById('importResults').style.display = 'none';
+        }
+
+        function cancelImport() {
+            document.getElementById('importPreview').style.display = 'none';
+            document.getElementById('excelFile').value = '';
+            tempImportData = [];
+        }
+
+        // Inizializza all'avvio
+        window.onload = function() {
+            const dataIngresso = document.getElementById('dataIngresso');
+            const dataOrdine = document.getElementById('dataOrdine');
+            
+            if (dataIngresso) dataIngresso.valueAsDate = new Date();
+            if (dataOrdine) dataOrdine.valueAsDate = new Date();
