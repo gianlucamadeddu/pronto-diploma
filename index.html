@@ -1016,6 +1016,23 @@
     <!-- SheetJS per leggere Excel -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
+    <!-- Firebase SDK (compat) -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyAKAs06_n8t19KH5CxMGisxZGM1Q5kpiU0",
+    authDomain: "pronto-diploma.firebaseapp.com",
+    databaseURL: "https://pronto-diploma-default-rtdb.europe-west1.firebasestorage.app",
+    projectId: "pronto-diploma",
+    storageBucket: "pronto-diploma.firebasestorage.app",
+    messagingSenderId: "640164355453",
+    appId: "1:640164355453:web:7c79a591af4869c54f4014"
+  };
+  const app = firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+</script>
+    
     <script>
         // Database locale in memoria
         let contracts = [];
