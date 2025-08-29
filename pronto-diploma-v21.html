@@ -1,0 +1,2347 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pronto Diploma - Sistema Gestione Contratti v2.1</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Login styles */
+        .login-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+
+        .login-box {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 400px;
+            max-width: 90%;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-header h1 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .login-header p {
+            color: #6c757d;
+        }
+
+        .login-form .form-group {
+            margin-bottom: 20px;
+        }
+
+        .login-form label {
+            display: block;
+            margin-bottom: 8px;
+            color: #495057;
+            font-weight: 600;
+        }
+
+        .login-form input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        .login-form input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .login-error {
+            color: #dc3545;
+            text-align: center;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .demo-badge {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: #ffc107;
+            color: #333;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 15px 25px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-size: 1em;
+            font-weight: 500;
+            color: #6c757d;
+            transition: all 0.3s;
+            position: relative;
+            white-space: nowrap;
+        }
+
+        .tab:hover {
+            color: #495057;
+        }
+
+        .tab.active {
+            color: #667eea;
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #667eea;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .search-section {
+            background: #e8f4fd;
+            border: 2px solid #0066cc;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .search-section h3 {
+            color: #0066cc;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .search-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 15px;
+            align-items: end;
+        }
+
+        .search-results {
+            margin-top: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+            background: white;
+            border-radius: 8px;
+            padding: 10px;
+            display: none;
+        }
+
+        .search-result-item {
+            padding: 10px;
+            border-bottom: 1px solid #e9ecef;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .search-result-item:hover {
+            background: #f8f9fa;
+        }
+
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #495057;
+            font-size: 0.9em;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+        }
+
+        .btn-success {
+            background: #28a745;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card h3 {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .value {
+            font-size: 2em;
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th {
+            background: #f8f9fa;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #495057;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .chart-container {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+
+        .month-filter {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .month-filter select {
+            padding: 10px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+
+        .export-btn {
+            margin-left: auto;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 0.85em;
+        }
+
+        canvas {
+            max-width: 100%;
+            height: auto !important;
+        }
+
+        .summary-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4ade80;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: slideIn 0.3s;
+            z-index: 1000;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(400px); }
+            to { transform: translateX(0); }
+        }
+
+        .incassi-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .incassi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .incasso-month {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .incasso-month label {
+            font-size: 0.85em;
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
+
+        .incasso-month input {
+            padding: 8px;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+        }
+
+        .venditori-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .venditore-card {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .venditore-card:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .venditore-name {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .add-venditore-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .add-venditore-form input {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .tabs {
+                overflow-x: auto;
+            }
+            
+            .tab {
+                padding: 12px 20px;
+                font-size: 0.9em;
+            }
+            
+            .export-btn {
+                margin-left: 0;
+                width: 100%;
+                margin-top: 10px;
+            }
+
+            .search-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="loginContainer" class="login-container">
+        <div class="login-box">
+            <div class="login-header">
+                <h1>🎓 Pronto Diploma</h1>
+                <p>Sistema di Gestione Contratti</p>
+            </div>
+            <form id="loginForm" class="login-form">
+                <div class="form-group">
+                    <label for="userId">ID Utente</label>
+                    <input type="text" id="userId" required autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required autocomplete="current-password">
+                </div>
+                <button type="submit" class="login-btn">Accedi</button>
+                <div id="loginError" class="login-error">ID o password non validi</div>
+            </form>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Main Container -->
+    <div id="mainContainer" class="container hidden">
+        <div class="header">
+            <span class="demo-badge">VERSIONE 2.1</span>
+            <h1>🎓 Pronto Diploma</h1>
+            <p>Sistema di Gestione Contratti e Report</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('inserimento', event)">📝 Inserimento</button>
+            <button class="tab" onclick="showTab('venditori', event)">👥 Venditori</button>
+            <button class="tab" onclick="showTab('contratti', event)">📋 Contratti</button>
+            <button class="tab" onclick="showTab('importa', event)">📤 Importa Excel</button>
+            <button class="tab" onclick="showTab('report', event)">📊 Report</button>
+            <button class="tab" onclick="showTab('analytics', event)">📈 Analytics</button>
+        </div>
+
+        <div class="content">
+            <!-- Tab Inserimento -->
+            <div id="inserimento" class="tab-content active">
+                <h2 style="margin-bottom: 20px;">Nuovo Contratto</h2>
+                
+                <!-- Sezione Ricerca -->
+                <div class="search-section">
+                    <h3>🔍 Ricerca Studente Esistente</h3>
+                    <div class="search-grid">
+                        <input type="text" id="searchNome" placeholder="Cerca per nome..." onkeyup="searchStudents()">
+                        <input type="text" id="searchCognome" placeholder="Cerca per cognome..." onkeyup="searchStudents()">
+                        <button class="btn btn-secondary" onclick="clearSearch()">Pulisci</button>
+                    </div>
+                    <div id="searchResults" class="search-results"></div>
+                </div>
+
+                <form id="contractForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Mese Produzione *</label>
+                            <select id="meseProduzione" required>
+                                <option value="">Seleziona...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Data Ingresso Lead *</label>
+                            <input type="date" id="dataIngresso" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Data Ordine *</label>
+                            <input type="date" id="dataOrdine" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Venditore *</label>
+                            <select id="venditore" required>
+                                <option value="">Seleziona...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Prodotto *</label>
+                            <select id="prodotto" required>
+                                <option value="">Seleziona...</option>
+                                <option value="ON LINE">ON LINE</option>
+                                <option value="VIRTUAL">VIRTUAL</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Nome Studente *</label>
+                            <input type="text" id="nomeStudente" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Cognome Studente *</label>
+                            <input type="text" id="cognomeStudente" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Prezzo (€) *</label>
+                            <input type="number" id="prezzo" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Tipo Rateizzazione</label>
+                            <select id="rateizzazione">
+                                <option value="Bonifico">Bonifico</option>
+                                <option value="Link To Pay">Link To Pay</option>
+                                <option value="Banca Sella Prestito al Consumo">Banca Sella Prestito al Consumo</option>
+                                <option value="Rateizzazione Interna">Rateizzazione Interna</option>
+                                <option value="Scalapay">Scalapay</option>
+                                <option value="Acconto + Link To Pay">Acconto + Link To Pay</option>
+                                <option value="Acconto + Banca Sella">Acconto + Banca Sella Prestito al Consumo</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Numero Contratti</label>
+                            <input type="number" id="numeroContratti" value="1" min="1">
+                        </div>
+                    </div>
+
+                    <div class="incassi-section">
+                        <h3>💰 Incassi Mensili</h3>
+                        <p style="margin-top: 10px; color: #6c757d;">Inserisci gli importi previsti per ogni mese (lascia vuoto se non previsto)</p>
+                        <div class="incassi-grid">
+                            <div class="incasso-month">
+                                <label>Gennaio</label>
+                                <input type="number" id="incassoGennaio" step="0.01" placeholder="0.00">
+                            </div>
+                            <div class="incasso-month">
+                                <label>Febbraio</label>
+                                <input type="number" id="incassoFebbraio" step="0.01" placeholder="0.00">
+                            </div>
+                            <div class="incasso-month">
+                                <label>Marzo</label>
+                                <input type="number" id="incassoMarzo" step="0.01" placeholder="0.00">
+                            </div>
+                            <div class="incasso-month">
+                                <label>Aprile</label>
+                                <input type="number" id="incassoAprile" step="0.01" placeholder="0.00">
+                            </div>
+                            <div class="incasso-month">
+                                <label>Maggio</label>
+                                <input type="number" id="incassoMaggio" step="0.01" placeholder="0.00">
+                            </div>
+                            <div class="incasso-month">
+                                <label>Giugno</label>
+                                <input type="number" id="incassoGiugno" step="0.01" placeholder="0.00">
+                            </div>
+                            <div class="incasso-month">
+                                <label>Luglio</label>
+                                <input type="number" id="incassoLuglio" step="0.01" placeholder="0.00">
+                            </div>
+                            <div class="incasso-month">
+                                <label>Agosto</label>
+                                <input type="number" id="incassoAgosto" step="0.01" placeholder="0.00">
+                            </div>
+                            <div class="incasso-month">
+                                <label>Settembre</label>
+                                <input type="number" id="incassoSettembre" step="0.01" placeholder="0.00">
+                            </div>
+                            <div class="incasso-month">
+                                <label>Ottobre</label>
+                                <input type="number" id="incassoOttobre" step="0.01" placeholder="0.00">
+                            </div>
+                            <div class="incasso-month">
+                                <label>Novembre</label>
+                                <input type="number" id="incassoNovembre" step="0.01" placeholder="0.00">
+                            </div>
+                            <div class="incasso-month">
+                                <label>Dicembre</label>
+                                <input type="number" id="incassoDicembre" step="0.01" placeholder="0.00">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn" id="saveBtn">✅ Salva Contratto</button>
+                </form>
+            </div>
+
+            <!-- Tab Venditori -->
+            <div id="venditori" class="tab-content">
+                <h2 style="margin-bottom: 20px;">Gestione Venditori</h2>
+                
+                <div class="add-venditore-form">
+                    <input type="text" id="nuovoVenditore" placeholder="Nome nuovo venditore" maxlength="50">
+                    <button class="btn btn-success" onclick="aggiungiVenditore()">➕ Aggiungi Venditore</button>
+                </div>
+
+                <h3 style="margin-bottom: 15px;">Venditori Attivi</h3>
+                <div id="venditoriList" class="venditori-list"></div>
+            </div>
+
+            <!-- Tab Elenco Contratti -->
+            <div id="contratti" class="tab-content">
+                <div class="month-filter">
+                    <h2>Elenco Contratti</h2>
+                    <select id="filterMonth" onchange="loadContracts()">
+                        <option value="">Tutti i mesi</option>
+                        <option value="1">Gennaio</option>
+                        <option value="2">Febbraio</option>
+                        <option value="3">Marzo</option>
+                        <option value="4">Aprile</option>
+                        <option value="5">Maggio</option>
+                        <option value="6">Giugno</option>
+                        <option value="7">Luglio</option>
+                        <option value="8">Agosto</option>
+                        <option value="9">Settembre</option>
+                        <option value="10">Ottobre</option>
+                        <option value="11">Novembre</option>
+                        <option value="12">Dicembre</option>
+                    </select>
+                    <select id="filterYear" onchange="loadContracts()">
+                        <option value="">Tutti gli anni</option>
+                        <option value="2024">2024</option>
+                        <option value="2025">2025</option>
+                        <option value="2026">2026</option>
+                        <option value="2027">2027</option>
+                        <option value="2028">2028</option>
+                        <option value="2029">2029</option>
+                        <option value="2030">2030</option>
+                    </select>
+                    <select id="filterVenditore" onchange="loadContracts()">
+                        <option value="">Tutti i venditori</option>
+                    </select>
+                    <button class="btn btn-secondary export-btn" onclick="exportData()">📥 Esporta Excel</button>
+                </div>
+                <div id="contractsList"></div>
+            </div>
+
+            <!-- Tab Importa Excel -->
+            <div id="importa" class="tab-content">
+                <h2>Importazione File Excel</h2>
+                
+                <div style="background: #e7f3ff; border: 2px solid #0066cc; border-radius: 12px; padding: 20px; margin: 20px 0;">
+                    <h3 style="color: #0066cc; margin-bottom: 15px;">📋 Formato File Excel Richiesto</h3>
+                    <p style="margin-bottom: 15px;">Il file Excel deve contenere le seguenti colonne (nell'ordine):</p>
+                    <ol style="margin-left: 20px; line-height: 1.8;">
+                        <li><strong>INGRESSO LEAD</strong> - Data ingresso (formato: AAAA-MM-GG)</li>
+                        <li><strong>Data ordine</strong> - Data ordine (formato: AAAA-MM-GG)</li>
+                        <li><strong>SALES</strong> - Nome venditore</li>
+                        <li><strong>Prodotto</strong> - ON LINE o VIRTUAL</li>
+                        <li><strong>Membro / Referente</strong> - Nome e Cognome studente</li>
+                        <li><strong>Prezzo</strong> - Importo numerico</li>
+                        <li><strong>Rateizzato</strong> - Tipo di rateizzazione</li>
+                        <li><strong>N CTR</strong> - Numero contratti</li>
+                        <li><strong>INCASSO [MESE]</strong> - Importi incasso per ogni mese (Gennaio-Dicembre)</li>
+                    </ol>
+                    <p style="margin-top: 15px; color: #666;">ℹ️ Il sistema leggerà il nome del foglio per determinare il mese di produzione (es: "LUGLIO 2025")</p>
+                </div>
+
+                <div style="background: white; border: 2px dashed #ddd; border-radius: 12px; padding: 40px; text-align: center; margin: 20px 0;">
+                    <input type="file" id="excelFile" accept=".xlsx,.xls" style="display: none;" onchange="handleFileSelect(event)">
+                    <div id="dropZone" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+                        <div style="font-size: 48px; color: #667eea; margin-bottom: 20px;">📁</div>
+                        <h3 style="margin-bottom: 15px;">Trascina qui il file Excel</h3>
+                        <p style="color: #666; margin-bottom: 20px;">oppure</p>
+                        <button class="btn" onclick="document.getElementById('excelFile').click()">Seleziona File</button>
+                    </div>
+                </div>
+
+                <div id="importPreview" style="display: none;">
+                    <h3 style="margin: 20px 0;">Anteprima Dati</h3>
+                    <div id="previewInfo" style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;"></div>
+                    <div style="max-height: 400px; overflow-y: auto;">
+                        <table id="previewTable" style="font-size: 0.9em;"></table>
+                    </div>
+                    <div style="margin-top: 20px; display: flex; gap: 10px;">
+                        <button class="btn btn-success" onclick="confirmImport()">✅ Conferma Importazione</button>
+                        <button class="btn btn-secondary" onclick="cancelImport()">❌ Annulla</button>
+                    </div>
+                </div>
+
+                <div id="importResults" style="display: none; margin-top: 20px;">
+                    <div style="background: #d4edda; border: 1px solid #c3e6cb; border-radius: 8px; padding: 15px;">
+                        <h4 style="color: #155724; margin-bottom: 10px;">✅ Importazione Completata</h4>
+                        <div id="importStats"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Report -->
+            <div id="report" class="tab-content">
+                <h2>Dashboard Report</h2>
+                
+                <!-- Filtri come in contratti -->
+                <div class="month-filter" style="margin-bottom: 25px;">
+                    <select id="reportFilterMonth" onchange="updateDashboard()">
+                        <option value="">Seleziona mese...</option>
+                        <option value="1">Gennaio</option>
+                        <option value="2">Febbraio</option>
+                        <option value="3">Marzo</option>
+                        <option value="4">Aprile</option>
+                        <option value="5">Maggio</option>
+                        <option value="6">Giugno</option>
+                        <option value="7">Luglio</option>
+                        <option value="8">Agosto</option>
+                        <option value="9">Settembre</option>
+                        <option value="10">Ottobre</option>
+                        <option value="11">Novembre</option>
+                        <option value="12">Dicembre</option>
+                    </select>
+                    <select id="reportFilterYear" onchange="updateDashboard()">
+                        <option value="2024">2024</option>
+                        <option value="2025" selected>2025</option>
+                        <option value="2026">2026</option>
+                        <option value="2027">2027</option>
+                        <option value="2028">2028</option>
+                        <option value="2029">2029</option>
+                        <option value="2030">2030</option>
+                    </select>
+                    <select id="reportFilterVenditore" onchange="updateDashboard()">
+                        <option value="">Tutti i venditori</option>
+                    </select>
+                </div>
+
+                <!-- Dashboard principale -->
+                <div id="dashboardSummary" style="display: none;">
+                    <div class="stats-grid" style="margin-bottom: 30px;">
+                        <div class="stat-card">
+                            <h3>Contratti del Mese</h3>
+                            <div class="value" id="dashTotContratti">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Incasso del Mese</h3>
+                            <div class="value" id="dashIncassoMese">€ 0,00</div>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Ricavo Totale Mese</h3>
+                            <div class="value" id="dashRicavoMese">€ 0,00</div>
+                        </div>
+                        <div class="stat-card" style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);">
+                            <h3>Contratti Stornati</h3>
+                            <div class="value" id="dashStornati">0</div>
+                            <div style="font-size: 0.9em; margin-top: 5px;">Valore: <span id="dashValoreStornati">€ 0</span></div>
+                        </div>
+                        <div class="stat-card" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">
+                            <h3>Prodotti</h3>
+                            <div style="font-size: 1.2em; margin-top: 10px;">
+                                <div style="margin-bottom: 8px;">📱 Online: <strong id="dashOnline">0</strong></div>
+                                <div>💻 Virtual: <strong id="dashVirtual">0</strong></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Messaggio se nessun mese selezionato -->
+                <div id="dashboardNoData" style="text-align: center; padding: 40px; background: #f8f9fa; border-radius: 12px; margin-bottom: 30px;">
+                    <p style="color: #6c757d; font-size: 1.1em;">Seleziona un mese per visualizzare la dashboard e il report dettagliato</p>
+                </div>
+
+                <!-- Report dettagliato venditori (esistente) -->
+                <div id="reportContent"></div>
+            </div>
+
+            <!-- Tab Analytics -->
+            <div id="analytics" class="tab-content">
+                <h2>Analytics - Analisi Comparativa</h2>
+                
+                <!-- Sezione confronto periodi -->
+                <div style="background: #f0f8ff; border: 2px solid #4a90e2; border-radius: 12px; padding: 20px; margin-bottom: 30px;">
+                    <h3 style="color: #4a90e2; margin-bottom: 20px;">📊 Confronto Periodi</h3>
+                    
+                    <!-- Periodo 1 -->
+                    <div style="margin-bottom: 20px;">
+                        <h4 style="color: #667eea; margin-bottom: 10px;">Periodo 1</h4>
+                        <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+                            <div>
+                                <label style="font-size: 0.9em; color: #666;">Dal:</label>
+                                <input type="date" id="periodo1Dal" onchange="updateAnalytics()" style="padding: 8px; border: 2px solid #e9ecef; border-radius: 6px;">
+                            </div>
+                            <div>
+                                <label style="font-size: 0.9em; color: #666;">Al:</label>
+                                <input type="date" id="periodo1Al" onchange="updateAnalytics()" style="padding: 8px; border: 2px solid #e9ecef; border-radius: 6px;">
+                            </div>
+                            <div>
+                                <label style="font-size: 0.9em; color: #666;">Etichetta:</label>
+                                <input type="text" id="periodo1Label" placeholder="es: Luglio 2025" style="padding: 8px; border: 2px solid #e9ecef; border-radius: 6px;">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Periodo 2 -->
+                    <div style="margin-bottom: 20px;">
+                        <h4 style="color: #764ba2; margin-bottom: 10px;">Periodo 2</h4>
+                        <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+                            <div>
+                                <label style="font-size: 0.9em; color: #666;">Dal:</label>
+                                <input type="date" id="periodo2Dal" onchange="updateAnalytics()" style="padding: 8px; border: 2px solid #e9ecef; border-radius: 6px;">
+                            </div>
+                            <div>
+                                <label style="font-size: 0.9em; color: #666;">Al:</label>
+                                <input type="date" id="periodo2Al" onchange="updateAnalytics()" style="padding: 8px; border: 2px solid #e9ecef; border-radius: 6px;">
+                            </div>
+                            <div>
+                                <label style="font-size: 0.9em; color: #666;">Etichetta:</label>
+                                <input type="text" id="periodo2Label" placeholder="es: Agosto 2025" style="padding: 8px; border: 2px solid #e9ecef; border-radius: 6px;">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Filtri venditori -->
+                    <div style="border-top: 1px solid #ddd; padding-top: 15px;">
+                        <h4 style="color: #333; margin-bottom: 10px;">Filtri</h4>
+                        <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+                            <select id="analyticsVenditore1" onchange="updateAnalytics()" style="padding: 10px; border: 2px solid #e9ecef; border-radius: 8px;">
+                                <option value="">Tutti i venditori (Periodo 1)</option>
+                            </select>
+                            <select id="analyticsVenditore2" onchange="updateAnalytics()" style="padding: 10px; border: 2px solid #e9ecef; border-radius: 8px;">
+                                <option value="">Tutti i venditori (Periodo 2)</option>
+                            </select>
+                            <button class="btn" onclick="updateAnalytics()">🔄 Aggiorna Confronto</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Statistiche comparative -->
+                <div id="comparativeStats" style="display: none;">
+                    <div class="stats-grid" style="margin-bottom: 30px;">
+                        <div class="stat-card" style="background: linear-gradient(135deg, #667eea 0%, #5a67d8 100%);">
+                            <h3>Periodo 1</h3>
+                            <div class="value" id="statsPeriodo1Contratti">0</div>
+                            <div style="font-size: 0.9em; margin-top: 5px;">Contratti</div>
+                        </div>
+                        <div class="stat-card" style="background: linear-gradient(135deg, #667eea 0%, #5a67d8 100%);">
+                            <h3>Periodo 1</h3>
+                            <div class="value" id="statsPeriodo1Valore">€ 0</div>
+                            <div style="font-size: 0.9em; margin-top: 5px;">Valore Totale</div>
+                        </div>
+                        <div class="stat-card" style="background: linear-gradient(135deg, #764ba2 0%, #6b42a0 100%);">
+                            <h3>Periodo 2</h3>
+                            <div class="value" id="statsPeriodo2Contratti">0</div>
+                            <div style="font-size: 0.9em; margin-top: 5px;">Contratti</div>
+                        </div>
+                        <div class="stat-card" style="background: linear-gradient(135deg, #764ba2 0%, #6b42a0 100%);">
+                            <h3>Periodo 2</h3>
+                            <div class="value" id="statsPeriodo2Valore">€ 0</div>
+                            <div style="font-size: 0.9em; margin-top: 5px;">Valore Totale</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabella confronto dettagliato -->
+                <div id="chartsContainer">
+                    <div style="background: white; border: 2px solid #e9ecef; border-radius: 12px; padding: 20px; margin-bottom: 30px;">
+                        <h3 style="margin-bottom: 15px; color: #333;">📊 Confronto Dettagliato Periodi</h3>
+                        <table id="comparisonTable" style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="background: #f8f9fa;">
+                                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #dee2e6;">Metrica</th>
+                                    <th style="padding: 12px; text-align: center; border-bottom: 2px solid #dee2e6; color: #667eea;">Periodo 1</th>
+                                    <th style="padding: 12px; text-align: center; border-bottom: 2px solid #dee2e6; color: #764ba2;">Periodo 2</th>
+                                    <th style="padding: 12px; text-align: center; border-bottom: 2px solid #dee2e6;">Differenza</th>
+                                </tr>
+                            </thead>
+                            <tbody id="comparisonTableBody">
+                                <!-- Dati inseriti dinamicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Messaggio iniziale -->
+                <div id="analyticsNoData" style="text-align: center; padding: 60px; background: #f8f9fa; border-radius: 12px;">
+                    <p style="color: #6c757d; font-size: 1.1em;">Seleziona i periodi da confrontare per visualizzare l'analisi comparativa</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SheetJS per leggere Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <script>
+        // Database locale in memoria
+        let contracts = [];
+        let venditori = [];
+        let nextId = 1;
+        let nextVenditoreId = 1;
+        let tempImportData = []; // Per memorizzare temporaneamente i dati da importare
+        let currentUser = null;
+
+        // Credenziali utenti (in produzione andrebbero su un server sicuro)
+        const users = {
+            'Amministrazione': {
+                password: 'prontodiploma',
+                permissions: ['inserimento', 'venditori', 'contratti']
+            },
+            'Gianluca Madeddu': {
+                password: 'sono1975',
+                permissions: ['inserimento', 'venditori', 'contratti', 'importa', 'report', 'analytics']
+            }
+        };
+
+        // Funzione di login
+        function login(userId, password) {
+            if (users[userId] && users[userId].password === password) {
+                currentUser = {
+                    id: userId,
+                    permissions: users[userId].permissions
+                };
+                return true;
+            }
+            return false;
+        }
+
+        // Gestione form login
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const userId = document.getElementById('userId').value;
+            const password = document.getElementById('password').value;
+            
+            if (login(userId, password)) {
+                document.getElementById('loginContainer').style.display = 'none';
+                document.getElementById('mainContainer').classList.remove('hidden');
+                
+                // Nasconde i tab non permessi
+                updateTabsVisibility();
+                
+                // Mostra il primo tab disponibile
+                const firstAvailableTab = currentUser.permissions[0];
+                showTab(firstAvailableTab);
+            } else {
+                document.getElementById('loginError').style.display = 'block';
+                document.getElementById('password').value = '';
+            }
+        });
+
+        // Aggiorna visibilità tab in base ai permessi
+        function updateTabsVisibility() {
+            const tabMapping = {
+                'inserimento': '📝 Inserimento',
+                'venditori': '👥 Venditori',
+                'contratti': '📋 Contratti',
+                'importa': '📤 Importa Excel',
+                'report': '📊 Report',
+                'analytics': '📈 Analytics'
+            };
+            
+            // Nasconde tutti i tab
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.style.display = 'none';
+            });
+            
+            // Mostra solo i tab permessi
+            currentUser.permissions.forEach(permission => {
+                const tabText = tabMapping[permission];
+                document.querySelectorAll('.tab').forEach(tab => {
+                    if (tab.textContent === tabText) {
+                        tab.style.display = 'block';
+                    }
+                });
+            });
+        }
+
+        // Inizializza venditori di default
+        function initializeDefaultVenditori() {
+            try {
+                const defaultVenditori = ['PALMAS', 'POMA', 'PESAPANE', 'CONGIU', 'DEIDDA', 
+                                         'CASULA EMANUELA', 'SERRA', 'CASULA R', 'DESOGUS'];
+                
+                venditori = defaultVenditori.map(nome => ({
+                    id: nextVenditoreId++,
+                    nome: nome,
+                    attivo: true
+                }));
+                
+                updateVenditoriSelect();
+                updateVenditoriList();
+            } catch (error) {
+                console.error('Errore in initializeDefaultVenditori:', error);
+            }
+        }
+
+        // Funzione di ricerca studenti
+        function searchStudents() {
+            try {
+                const searchNome = document.getElementById('searchNome').value.toLowerCase();
+                const searchCognome = document.getElementById('searchCognome').value.toLowerCase();
+                const resultsDiv = document.getElementById('searchResults');
+                
+                if (!searchNome && !searchCognome) {
+                    resultsDiv.style.display = 'none';
+                    return;
+                }
+                
+                const filtered = contracts.filter(c => {
+                    const matchNome = searchNome ? c.nomeStudente.toLowerCase().includes(searchNome) : true;
+                    const matchCognome = searchCognome ? c.cognomeStudente.toLowerCase().includes(searchCognome) : true;
+                    return matchNome && matchCognome;
+                });
+                
+                if (filtered.length > 0) {
+                    resultsDiv.innerHTML = filtered.map(c => `
+                        <div class="search-result-item" onclick="selectStudent(${c.id})">
+                            <strong>${c.nomeStudente} ${c.cognomeStudente}</strong> - 
+                            ${c.prodotto} - €${c.prezzo} - 
+                            ${new Date(c.dataOrdine).toLocaleDateString('it-IT')}
+                        </div>
+                    `).join('');
+                    resultsDiv.style.display = 'block';
+                } else {
+                    resultsDiv.innerHTML = '<div style="padding: 10px; color: #6c757d;">Nessuno studente trovato</div>';
+                    resultsDiv.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Errore in searchStudents:', error);
+            }
+        }
+
+        // Seleziona studente dalla ricerca
+        function selectStudent(id) {
+            try {
+                const contract = contracts.find(c => c.id === id);
+                if (contract) {
+                    document.getElementById('nomeStudente').value = contract.nomeStudente;
+                    document.getElementById('cognomeStudente').value = contract.cognomeStudente;
+                    clearSearch();
+                }
+            } catch (error) {
+                console.error('Errore in selectStudent:', error);
+            }
+        }
+
+        // Pulisci ricerca
+        function clearSearch() {
+            try {
+                document.getElementById('searchNome').value = '';
+                document.getElementById('searchCognome').value = '';
+                document.getElementById('searchResults').style.display = 'none';
+            } catch (error) {
+                console.error('Errore in clearSearch:', error);
+            }
+        }
+
+        // Aggiorna select venditori
+        function updateVenditoriSelect() {
+            try {
+                const select = document.getElementById('venditore');
+                const filterSelect = document.getElementById('filterVenditore');
+                const reportFilterSelect = document.getElementById('reportFilterVenditore');
+                
+                if (select) {
+                    select.innerHTML = '<option value="">Seleziona...</option>';
+                    venditori.filter(v => v.attivo).forEach(v => {
+                        select.innerHTML += `<option value="${v.nome}">${v.nome}</option>`;
+                    });
+                }
+                
+                if (filterSelect) {
+                    filterSelect.innerHTML = '<option value="">Tutti i venditori</option>';
+                    venditori.filter(v => v.attivo).forEach(v => {
+                        filterSelect.innerHTML += `<option value="${v.nome}">${v.nome}</option>`;
+                    });
+                }
+                
+                if (reportFilterSelect) {
+                    reportFilterSelect.innerHTML = '<option value="">Tutti i venditori</option>';
+                    venditori.filter(v => v.attivo).forEach(v => {
+                        reportFilterSelect.innerHTML += `<option value="${v.nome}">${v.nome}</option>`;
+                    });
+                }
+            } catch (error) {
+                console.error('Errore in updateVenditoriSelect:', error);
+            }
+        }
+
+        // Aggiorna lista venditori
+        function updateVenditoriList() {
+            try {
+                const list = document.getElementById('venditoriList');
+                if (!list) return;
+                
+                const activeVenditori = venditori.filter(v => v.attivo);
+                
+                if (activeVenditori.length === 0) {
+                    list.innerHTML = '<p style="text-align: center; padding: 40px; color: #6c757d;">Nessun venditore presente</p>';
+                    return;
+                }
+                
+                list.innerHTML = activeVenditori.map(v => `
+                    <div class="venditore-card">
+                        <span class="venditore-name">${v.nome}</span>
+                        <button class="btn btn-danger btn-small" onclick="rimuoviVenditore(${v.id})">🗑️</button>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Errore in updateVenditoriList:', error);
+            }
+        }
+
+        // Aggiungi venditore
+        function aggiungiVenditore() {
+            try {
+                const nome = document.getElementById('nuovoVenditore').value.trim().toUpperCase();
+                
+                if (!nome) {
+                    alert('⚠️ Inserisci il nome del venditore');
+                    return;
+                }
+                
+                if (venditori.some(v => v.nome === nome && v.attivo)) {
+                    alert('⚠️ Questo venditore esiste già');
+                    return;
+                }
+                
+                venditori.push({
+                    id: nextVenditoreId++,
+                    nome: nome,
+                    attivo: true
+                });
+                
+                document.getElementById('nuovoVenditore').value = '';
+                updateVenditoriSelect();
+                updateVenditoriList();
+                showNotification('✅ Venditore aggiunto');
+            } catch (error) {
+                console.error('Errore in aggiungiVenditore:', error);
+            }
+        }
+
+        // Rimuovi venditore
+        function rimuoviVenditore(id) {
+            try {
+                if (confirm('⚠️ Vuoi rimuovere questo venditore?')) {
+                    const venditore = venditori.find(v => v.id === id);
+                    if (venditore) {
+                        venditore.attivo = false;
+                        updateVenditoriSelect();
+                        updateVenditoriList();
+                        showNotification('✅ Venditore rimosso');
+                    }
+                }
+            } catch (error) {
+                console.error('Errore in rimuoviVenditore:', error);
+            }
+        }
+
+        // Mostra notifica
+        function showNotification(message) {
+            try {
+                const notification = document.createElement('div');
+                notification.className = 'notification';
+                notification.textContent = message;
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.remove();
+                }, 3000);
+            } catch (error) {
+                console.error('Errore in showNotification:', error);
+            }
+        }
+
+        // Inizializza i filtri
+        function initializeFilters() {
+            try {
+                const months = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 
+                               'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'];
+                
+                // Genera opzioni mesi produzione
+                const meseProdSelect = document.getElementById('meseProduzione');
+                if (meseProdSelect) {
+                    const currentYear = new Date().getFullYear();
+                    const currentMonth = new Date().getMonth() + 1;
+                    
+                    meseProdSelect.innerHTML = '<option value="">Seleziona...</option>';
+                    
+                    for (let year = 2024; year <= 2030; year++) {
+                        months.forEach((month, index) => {
+                            const option = document.createElement('option');
+                            option.value = `${year}-${String(index + 1).padStart(2, '0')}`;
+                            option.text = `${month} ${year}`;
+                            
+                            if (year === currentYear && index + 1 === currentMonth) {
+                                option.selected = true;
+                            }
+                            
+                            meseProdSelect.appendChild(option);
+                        });
+                    }
+                }
+                
+                // Imposta mese corrente nel report
+                const reportMonth = document.getElementById('reportMonth');
+                if (reportMonth) {
+                    const currentMonth = new Date().getMonth() + 1;
+                    reportMonth.value = currentMonth;
+                }
+                
+                // Imposta anno corrente nel filtro
+                const filterYear = document.getElementById('filterYear');
+                if (filterYear) {
+                    const currentYear = new Date().getFullYear();
+                    if (currentYear >= 2024 && currentYear <= 2030) {
+                        filterYear.value = currentYear.toString();
+                    }
+                }
+            } catch (error) {
+                console.error('Errore in initializeFilters:', error);
+            }
+        }
+
+        // Mostra tab
+        function showTab(tabName, event) {
+            try {
+                if (event) event.preventDefault();
+                
+                // Verifica permessi
+                if (currentUser && !currentUser.permissions.includes(tabName)) {
+                    return;
+                }
+                
+                document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                
+                if (event && event.target) {
+                    event.target.classList.add('active');
+                } else {
+                    // Se non c'è evento, trova e attiva il tab corrispondente
+                    const tabMapping = {
+                        'inserimento': '📝 Inserimento',
+                        'venditori': '👥 Venditori',
+                        'contratti': '📋 Contratti',
+                        'importa': '📤 Importa Excel',
+                        'report': '📊 Report',
+                        'analytics': '📈 Analytics'
+                    };
+                    document.querySelectorAll('.tab').forEach(tab => {
+                        if (tab.textContent === tabMapping[tabName]) {
+                            tab.classList.add('active');
+                        }
+                    });
+                }
+                
+                const tabContent = document.getElementById(tabName);
+                if (tabContent) {
+                    tabContent.classList.add('active');
+                }
+
+                if (tabName === 'contratti') {
+                    loadContracts();
+                } else if (tabName === 'report') {
+                    updateDashboard();
+                } else if (tabName === 'analytics') {
+                    generateAnalytics();
+                }
+            } catch (error) {
+                console.error('Errore in showTab:', error);
+            }
+        }
+
+        // Gestione form contratti
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('contractForm');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    try {
+                        e.preventDefault();
+                        
+                        const saveBtn = document.getElementById('saveBtn');
+                        saveBtn.disabled = true;
+                        saveBtn.textContent = '⏳ Salvataggio...';
+
+                        // Raccogli gli incassi mensili
+                        const incassi = {};
+                        const mesi = ['gennaio', 'febbraio', 'marzo', 'aprile', 'maggio', 'giugno',
+                                     'luglio', 'agosto', 'settembre', 'ottobre', 'novembre', 'dicembre'];
+                        
+                        mesi.forEach(mese => {
+                            const value = parseFloat(document.getElementById(`incasso${mese.charAt(0).toUpperCase() + mese.slice(1)}`).value) || 0;
+                            if (value > 0) {
+                                incassi[mese] = value;
+                            }
+                        });
+
+                        const contract = {
+                            id: nextId++,
+                            meseProduzione: document.getElementById('meseProduzione').value,
+                            dataIngresso: document.getElementById('dataIngresso').value,
+                            dataOrdine: document.getElementById('dataOrdine').value,
+                            venditore: document.getElementById('venditore').value,
+                            prodotto: document.getElementById('prodotto').value,
+                            nomeStudente: document.getElementById('nomeStudente').value.trim(),
+                            cognomeStudente: document.getElementById('cognomeStudente').value.trim(),
+                            prezzo: parseFloat(document.getElementById('prezzo').value),
+                            rateizzazione: document.getElementById('rateizzazione').value,
+                            numeroContratti: parseInt(document.getElementById('numeroContratti').value),
+                            incassi: incassi,
+                            timestamp: Date.now()
+                        };
+
+                        contracts.push(contract);
+                        
+                        showNotification('✅ Contratto salvato con successo!');
+                        form.reset();
+                        
+                        // Reimposta valori default
+                        document.getElementById('dataIngresso').valueAsDate = new Date();
+                        document.getElementById('dataOrdine').valueAsDate = new Date();
+                        document.getElementById('numeroContratti').value = 1;
+                        initializeFilters();
+                        
+                        saveBtn.disabled = false;
+                        saveBtn.textContent = '✅ Salva Contratto';
+                    } catch (error) {
+                        console.error('Errore nel salvataggio:', error);
+                        document.getElementById('saveBtn').disabled = false;
+                        document.getElementById('saveBtn').textContent = '✅ Salva Contratto';
+                    }
+                });
+            }
+        });
+
+        // Carica contratti
+        function loadContracts() {
+            try {
+                const filterMonth = document.getElementById('filterMonth').value;
+                const filterYear = document.getElementById('filterYear').value;
+                const filterVenditore = document.getElementById('filterVenditore').value;
+                
+                let filtered = contracts;
+                
+                // Filtra per mese e/o anno
+                if (filterMonth || filterYear) {
+                    filtered = filtered.filter(c => {
+                        const [cYear, cMonth] = c.meseProduzione.split('-');
+                        const matchMonth = filterMonth ? parseInt(cMonth) == filterMonth : true;
+                        const matchYear = filterYear ? cYear === filterYear : true;
+                        return matchMonth && matchYear;
+                    });
+                }
+                
+                if (filterVenditore) {
+                    filtered = filtered.filter(c => c.venditore === filterVenditore);
+                }
+
+                filtered.sort((a, b) => new Date(b.dataOrdine) - new Date(a.dataOrdine));
+
+                const html = filtered.length === 0 ? 
+                    '<p style="text-align: center; padding: 40px; color: #6c757d;">Nessun contratto trovato</p>' :
+                    `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Mese Prod.</th>
+                                <th>Data Ordine</th>
+                                <th>Venditore</th>
+                                <th>Studente</th>
+                                <th>Prodotto</th>
+                                <th>Prezzo</th>
+                                <th>Rateizzazione</th>
+                                <th>N° CTR</th>
+                                <th>Incassi Tot.</th>
+                                <th>Azioni</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${filtered.map(c => {
+                                const totIncassi = Object.values(c.incassi || {}).reduce((sum, val) => sum + val, 0);
+                                const [year, month] = c.meseProduzione.split('-');
+                                const monthNames = ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic'];
+                                const meseProdText = `${monthNames[parseInt(month)-1]} ${year}`;
+                                
+                                return `
+                                    <tr>
+                                        <td><strong>${meseProdText}</strong></td>
+                                        <td>${new Date(c.dataOrdine).toLocaleDateString('it-IT')}</td>
+                                        <td>${c.venditore}</td>
+                                        <td>${c.nomeStudente} ${c.cognomeStudente}</td>
+                                        <td><span style="background: ${c.prodotto === 'ON LINE' ? '#667eea' : '#764ba2'}; color: white; padding: 2px 8px; border-radius: 4px;">${c.prodotto}</span></td>
+                                        <td>€ ${c.prezzo.toFixed(2)}</td>
+                                        <td style="font-size: 0.85em;">${c.rateizzazione}</td>
+                                        <td>${c.numeroContratti}</td>
+                                        <td>€ ${totIncassi.toFixed(2)}</td>
+                                        <td class="actions">
+                                            ${c.stornato ? 
+                                                '<span style="color: #dc3545; font-weight: bold;">STORNATO</span>' :
+                                                `<button class="btn btn-secondary btn-small" onclick="stornaContract(${c.id})" title="Storna contratto">⚠️</button>`
+                                            }
+                                            <button class="btn btn-danger btn-small" onclick="deleteContract(${c.id})">🗑️</button>
+                                        </td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                    <p style="margin-top: 20px; color: #6c757d;">Totale contratti: ${filtered.length}</p>
+                `;
+                
+                const contractsList = document.getElementById('contractsList');
+                if (contractsList) {
+                    contractsList.innerHTML = html;
+                }
+            } catch (error) {
+                console.error('Errore in loadContracts:', error);
+            }
+        }
+
+        // Storna contratto
+        function stornaContract(id) {
+            try {
+                if (confirm('⚠️ Vuoi stornare questo contratto? Il contratto verrà marcato come STORNATO e non verrà più conteggiato nelle statistiche.')) {
+                    const contract = contracts.find(c => c.id === id);
+                    if (contract) {
+                        contract.stornato = true;
+                        contract.dataStorno = new Date().toISOString().split('T')[0];
+                        loadContracts();
+                        showNotification('⚠️ Contratto stornato');
+                    }
+                }
+            } catch (error) {
+                console.error('Errore in stornaContract:', error);
+            }
+        }
+
+        // Elimina contratto
+        function deleteContract(id) {
+            try {
+                if (confirm('⚠️ Sei sicuro di voler eliminare definitivamente questo contratto?')) {
+                    contracts = contracts.filter(c => c.id !== id);
+                    loadContracts();
+                    showNotification('✅ Contratto eliminato');
+                }
+            } catch (error) {
+                console.error('Errore in deleteContract:', error);
+            }
+        }
+
+        // Aggiorna dashboard report
+        function updateDashboard() {
+            try {
+                const month = parseInt(document.getElementById('reportFilterMonth').value);
+                const year = parseInt(document.getElementById('reportFilterYear').value);
+                const filterVenditore = document.getElementById('reportFilterVenditore').value;
+                
+                if (!month) {
+                    document.getElementById('dashboardSummary').style.display = 'none';
+                    document.getElementById('dashboardNoData').style.display = 'block';
+                    document.getElementById('reportContent').innerHTML = '';
+                    return;
+                }
+                
+                // Mostra dashboard
+                document.getElementById('dashboardSummary').style.display = 'block';
+                document.getElementById('dashboardNoData').style.display = 'none';
+                
+                // Filtra contratti
+                let allFiltered = contracts.filter(c => {
+                    const [cYear, cMonth] = c.meseProduzione.split('-');
+                    return parseInt(cMonth) === month && parseInt(cYear) === year;
+                });
+                
+                if (filterVenditore) {
+                    allFiltered = allFiltered.filter(c => c.venditore === filterVenditore);
+                }
+                
+                // Separa contratti validi e stornati
+                const filtered = allFiltered.filter(c => !c.stornato);
+                const stornati = allFiltered.filter(c => c.stornato);
+                
+                // Calcola statistiche dashboard
+                const monthNames = ['', 'Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 
+                                   'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'];
+                const meseKey = monthNames[month].toLowerCase();
+                
+                let totaleContratti = 0;
+                let incassoMese = 0;
+                let ricavoTotale = 0;
+                let contrattiOnline = 0;
+                let contrattiVirtual = 0;
+                
+                filtered.forEach(c => {
+                    totaleContratti += c.numeroContratti;
+                    ricavoTotale += c.prezzo;
+                    incassoMese += (c.incassi && c.incassi[meseKey]) ? c.incassi[meseKey] : 0;
+                    
+                    if (c.prodotto === 'ON LINE') contrattiOnline++;
+                    else if (c.prodotto === 'VIRTUAL') contrattiVirtual++;
+                });
+                
+                // Calcola statistiche stornati
+                let totaleStornati = 0;
+                let valoreStornati = 0;
+                stornati.forEach(c => {
+                    totaleStornati += c.numeroContratti;
+                    valoreStornati += c.prezzo;
+                });
+                
+                // Aggiorna dashboard
+                document.getElementById('dashTotContratti').textContent = totaleContratti;
+                document.getElementById('dashIncassoMese').textContent = '€ ' + incassoMese.toLocaleString('it-IT', {minimumFractionDigits: 2});
+                document.getElementById('dashRicavoMese').textContent = '€ ' + ricavoTotale.toLocaleString('it-IT', {minimumFractionDigits: 2});
+                document.getElementById('dashOnline').textContent = contrattiOnline;
+                document.getElementById('dashVirtual').textContent = contrattiVirtual;
+                document.getElementById('dashStornati').textContent = totaleStornati;
+                document.getElementById('dashValoreStornati').textContent = '€ ' + valoreStornati.toLocaleString('it-IT', {minimumFractionDigits: 2});
+                
+                // Genera report dettagliato venditori (solo contratti validi)
+                generateDetailedReport(filtered, month, year);
+                
+            } catch (error) {
+                console.error('Errore in updateDashboard:', error);
+            }
+        }
+
+        // Genera report dettagliato venditori
+        function generateDetailedReport(filtered, month, year) {
+            try {
+                const monthNames = ['', 'Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 
+                                   'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'];
+                
+                if (filtered.length === 0) {
+                    document.getElementById('reportContent').innerHTML = `
+                        <div style="background: #f8f9fa; border-radius: 12px; padding: 30px; text-align: center; margin-top: 20px;">
+                            <p style="color: #6c757d;">Nessun contratto trovato per i criteri selezionati</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Raggruppa per venditore
+                const venditorData = {};
+                filtered.forEach(c => {
+                    if (!venditorData[c.venditore]) {
+                        venditorData[c.venditore] = {
+                            contratti: 0,
+                            incassoMese: 0,
+                            ricavoTotale: 0,
+                            online: 0,
+                            virtual: 0
+                        };
+                    }
+                    venditorData[c.venditore].contratti += c.numeroContratti;
+                    
+                    const meseKey = monthNames[month].toLowerCase();
+                    venditorData[c.venditore].incassoMese += (c.incassi && c.incassi[meseKey]) ? c.incassi[meseKey] : 0;
+                    venditorData[c.venditore].ricavoTotale += c.prezzo;
+                    
+                    if (c.prodotto === 'ON LINE') venditorData[c.venditore].online++;
+                    else if (c.prodotto === 'VIRTUAL') venditorData[c.venditore].virtual++;
+                });
+
+                const totali = {
+                    contratti: 0,
+                    incassoMese: 0,
+                    ricavoTotale: 0,
+                    online: 0,
+                    virtual: 0
+                };
+
+                Object.values(venditorData).forEach(v => {
+                    totali.contratti += v.contratti;
+                    totali.incassoMese += v.incassoMese;
+                    totali.ricavoTotale += v.ricavoTotale;
+                    totali.online += v.online;
+                    totali.virtual += v.virtual;
+                });
+
+                const sortedVenditori = Object.entries(venditorData).sort((a, b) => b[1].ricavoTotale - a[1].ricavoTotale);
+
+                const html = `
+                    <div style="margin-top: 30px;">
+                        <h3 style="margin-bottom: 20px;">📊 Report Dettaglio Venditori - ${monthNames[month]} ${year}</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Venditore</th>
+                                    <th>N° Contratti</th>
+                                    <th>Incasso ${monthNames[month]}</th>
+                                    <th>Ricavo Totale</th>
+                                    <th>Media Incasso</th>
+                                    <th>Media/Contratto</th>
+                                    <th>% Incasso</th>
+                                    <th>Online/Virtual</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${sortedVenditori.map(([nome, data], index) => {
+                                    const percIncasso = data.ricavoTotale ? ((data.incassoMese / data.ricavoTotale) * 100) : 0;
+                                    const medal = index === 0 ? '🥇 ' : index === 1 ? '🥈 ' : index === 2 ? '🥉 ' : '';
+                                    return `
+                                        <tr style="${index < 3 ? 'background: #fffbf0;' : ''}">
+                                            <td><strong>${medal}${nome}</strong></td>
+                                            <td>${data.contratti}</td>
+                                            <td>€ ${data.incassoMese.toLocaleString('it-IT', {minimumFractionDigits: 2})}</td>
+                                            <td>€ ${data.ricavoTotale.toLocaleString('it-IT', {minimumFractionDigits: 2})}</td>
+                                            <td>€ ${data.contratti ? (data.incassoMese / data.contratti).toLocaleString('it-IT', {minimumFractionDigits: 2}) : '0,00'}</td>
+                                            <td>€ ${data.contratti ? (data.ricavoTotale / data.contratti).toLocaleString('it-IT', {minimumFractionDigits: 2}) : '0,00'}</td>
+                                            <td><strong>${percIncasso.toFixed(2)}%</strong></td>
+                                            <td>${data.online}/${data.virtual}</td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                            <tfoot>
+                                <tr style="background: #f8f9fa; font-weight: bold;">
+                                    <td>TOTALE</td>
+                                    <td>${totali.contratti}</td>
+                                    <td>€ ${totali.incassoMese.toLocaleString('it-IT', {minimumFractionDigits: 2})}</td>
+                                    <td>€ ${totali.ricavoTotale.toLocaleString('it-IT', {minimumFractionDigits: 2})}</td>
+                                    <td>€ ${totali.contratti ? (totali.incassoMese / totali.contratti).toLocaleString('it-IT', {minimumFractionDigits: 2}) : '0,00'}</td>
+                                    <td>€ ${totali.contratti ? (totali.ricavoTotale / totali.contratti).toLocaleString('it-IT', {minimumFractionDigits: 2}) : '0,00'}</td>
+                                    <td>${totali.ricavoTotale ? ((totali.incassoMese / totali.ricavoTotale) * 100).toFixed(2) : '0,00'}%</td>
+                                    <td>${totali.online}/${totali.virtual}</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                `;
+
+                document.getElementById('reportContent').innerHTML = html;
+            } catch (error) {
+                console.error('Errore in generateDetailedReport:', error);
+            }
+        }
+
+        // Genera report (funzione aggiornata per retrocompatibilità)
+        function generateReport() {
+            updateDashboard();
+        }
+
+        // Genera Analytics
+        function generateAnalytics() {
+            try {
+                // Inizializza select venditori per analytics
+                const analyticsVenditore1 = document.getElementById('analyticsVenditore1');
+                const analyticsVenditore2 = document.getElementById('analyticsVenditore2');
+                
+                if (analyticsVenditore1 && analyticsVenditore2) {
+                    analyticsVenditore1.innerHTML = '<option value="">Tutti i venditori (Periodo 1)</option>';
+                    analyticsVenditore2.innerHTML = '<option value="">Tutti i venditori (Periodo 2)</option>';
+                    
+                    venditori.filter(v => v.attivo).forEach(v => {
+                        analyticsVenditore1.innerHTML += `<option value="${v.nome}">${v.nome}</option>`;
+                        analyticsVenditore2.innerHTML += `<option value="${v.nome}">${v.nome}</option>`;
+                    });
+                }
+                
+                // Imposta date di default (ultimo mese e mese corrente)
+                const oggi = new Date();
+                const primoGiornoMeseCorrente = new Date(oggi.getFullYear(), oggi.getMonth(), 1);
+                const ultimoGiornoMeseCorrente = new Date(oggi.getFullYear(), oggi.getMonth() + 1, 0);
+                const primoGiornoMesePrecedente = new Date(oggi.getFullYear(), oggi.getMonth() - 1, 1);
+                const ultimoGiornoMesePrecedente = new Date(oggi.getFullYear(), oggi.getMonth(), 0);
+                
+                const periodo1Dal = document.getElementById('periodo1Dal');
+                const periodo1Al = document.getElementById('periodo1Al');
+                const periodo2Dal = document.getElementById('periodo2Dal');
+                const periodo2Al = document.getElementById('periodo2Al');
+                
+                if (periodo1Dal && !periodo1Dal.value) {
+                    periodo1Dal.valueAsDate = primoGiornoMesePrecedente;
+                }
+                if (periodo1Al && !periodo1Al.value) {
+                    periodo1Al.valueAsDate = ultimoGiornoMesePrecedente;
+                }
+                if (periodo2Dal && !periodo2Dal.value) {
+                    periodo2Dal.valueAsDate = primoGiornoMeseCorrente;
+                }
+                if (periodo2Al && !periodo2Al.value) {
+                    periodo2Al.valueAsDate = oggi;
+                }
+                
+                // Mostra messaggio iniziale
+                document.getElementById('analyticsNoData').style.display = 'block';
+                document.getElementById('comparativeStats').style.display = 'none';
+                document.getElementById('chartsContainer').style.display = 'none';
+                
+            } catch (error) {
+                console.error('Errore in generateAnalytics:', error);
+            }
+        }
+        
+        // Aggiorna analytics con confronto periodi
+        function updateAnalytics() {
+            try {
+                const periodo1Dal = document.getElementById('periodo1Dal').value;
+                const periodo1Al = document.getElementById('periodo1Al').value;
+                const periodo2Dal = document.getElementById('periodo2Dal').value;
+                const periodo2Al = document.getElementById('periodo2Al').value;
+                
+                if (!periodo1Dal || !periodo1Al || !periodo2Dal || !periodo2Al) {
+                    document.getElementById('analyticsNoData').style.display = 'block';
+                    document.getElementById('comparativeStats').style.display = 'none';
+                    document.getElementById('chartsContainer').style.display = 'none';
+                    return;
+                }
+                
+                // Nascondi messaggio e mostra tabella
+                document.getElementById('analyticsNoData').style.display = 'none';
+                document.getElementById('comparativeStats').style.display = 'block';
+                document.getElementById('chartsContainer').style.display = 'block';
+                
+                // Filtra contratti per periodo 1
+                const venditore1 = document.getElementById('analyticsVenditore1').value;
+                let contratti1 = contracts.filter(c => {
+                    const dataOrdine = new Date(c.dataOrdine);
+                    return dataOrdine >= new Date(periodo1Dal) && dataOrdine <= new Date(periodo1Al);
+                });
+                
+                if (venditore1) {
+                    contratti1 = contratti1.filter(c => c.venditore === venditore1);
+                }
+                
+                // Filtra contratti per periodo 2
+                const venditore2 = document.getElementById('analyticsVenditore2').value;
+                let contratti2 = contracts.filter(c => {
+                    const dataOrdine = new Date(c.dataOrdine);
+                    return dataOrdine >= new Date(periodo2Dal) && dataOrdine <= new Date(periodo2Al);
+                });
+                
+                if (venditore2) {
+                    contratti2 = contratti2.filter(c => c.venditore === venditore2);
+                }
+                
+                // Calcola statistiche
+                const stats1 = calcolaStatistiche(contratti1);
+                const stats2 = calcolaStatistiche(contratti2);
+                
+                // Aggiorna cards statistiche
+                document.getElementById('statsPeriodo1Contratti').textContent = stats1.totaleContratti;
+                document.getElementById('statsPeriodo1Valore').textContent = '€ ' + stats1.totaleValore.toLocaleString('it-IT', {minimumFractionDigits: 2});
+                document.getElementById('statsPeriodo2Contratti').textContent = stats2.totaleContratti;
+                document.getElementById('statsPeriodo2Valore').textContent = '€ ' + stats2.totaleValore.toLocaleString('it-IT', {minimumFractionDigits: 2});
+                
+                // Etichette periodi
+                const label1 = document.getElementById('periodo1Label').value || 
+                              `${new Date(periodo1Dal).toLocaleDateString('it-IT')} - ${new Date(periodo1Al).toLocaleDateString('it-IT')}`;
+                const label2 = document.getElementById('periodo2Label').value || 
+                              `${new Date(periodo2Dal).toLocaleDateString('it-IT')} - ${new Date(periodo2Al).toLocaleDateString('it-IT')}`;
+                
+                // Genera solo la tabella comparativa
+                generaTabellaComparativa(contratti1, contratti2, periodo1Dal, periodo1Al, periodo2Dal, periodo2Al, label1, label2);
+                
+            } catch (error) {
+                console.error('Errore in updateAnalytics:', error);
+            }
+        }
+        
+        // Calcola statistiche per un set di contratti
+        function calcolaStatistiche(contratti) {
+            const validi = contratti.filter(c => !c.stornato);
+            const stornati = contratti.filter(c => c.stornato);
+            
+            return {
+                totaleContratti: validi.reduce((sum, c) => sum + c.numeroContratti, 0),
+                totaleValore: validi.reduce((sum, c) => sum + c.prezzo, 0),
+                online: validi.filter(c => c.prodotto === 'ON LINE').length,
+                virtual: validi.filter(c => c.prodotto === 'VIRTUAL').length,
+                stornati: stornati.length,
+                valoreStornati: stornati.reduce((sum, c) => sum + c.prezzo, 0)
+            };
+        }
+        
+        // Genera tabella comparativa
+        function generaTabellaComparativa(contratti1, contratti2, dal1, al1, dal2, al2, label1, label2) {
+            try {
+                const stats1 = calcolaStatistiche(contratti1);
+                const stats2 = calcolaStatistiche(contratti2);
+                
+                // Calcola medie e differenze
+                const mediaValore1 = stats1.totaleContratti > 0 ? stats1.totaleValore / stats1.totaleContratti : 0;
+                const mediaValore2 = stats2.totaleContratti > 0 ? stats2.totaleValore / stats2.totaleContratti : 0;
+                
+                // Calcola differenze percentuali
+                const diffContratti = stats2.totaleContratti - stats1.totaleContratti;
+                const percDiffContratti = stats1.totaleContratti > 0 ? (diffContratti / stats1.totaleContratti * 100) : 0;
+                
+                const diffValore = stats2.totaleValore - stats1.totaleValore;
+                const percDiffValore = stats1.totaleValore > 0 ? (diffValore / stats1.totaleValore * 100) : 0;
+                
+                const diffStornati = stats2.stornati - stats1.stornati;
+                
+                // Popola tabella
+                const tableBody = document.getElementById('comparisonTableBody');
+                tableBody.innerHTML = `
+                    <tr>
+                        <td>Numero Contratti Validi</td>
+                        <td style="text-align: center;">${stats1.totaleContratti}</td>
+                        <td style="text-align: center;">${stats2.totaleContratti}</td>
+                        <td style="text-align: center; font-weight: bold; color: ${diffContratti >= 0 ? '#28a745' : '#dc3545'}">
+                            ${diffContratti >= 0 ? '+' : ''}${diffContratti} (${percDiffContratti >= 0 ? '+' : ''}${percDiffContratti.toFixed(1)}%)
+                        </td>
+                    </tr>
+                    <tr style="background: #f8f9fa;">
+                        <td>Valore Totale</td>
+                        <td style="text-align: center;">€ ${stats1.totaleValore.toLocaleString('it-IT', {minimumFractionDigits: 2})}</td>
+                        <td style="text-align: center;">€ ${stats2.totaleValore.toLocaleString('it-IT', {minimumFractionDigits: 2})}</td>
+                        <td style="text-align: center; font-weight: bold; color: ${diffValore >= 0 ? '#28a745' : '#dc3545'}">
+                            ${diffValore >= 0 ? '+' : ''}€ ${diffValore.toLocaleString('it-IT', {minimumFractionDigits: 2})} 
+                            (${percDiffValore >= 0 ? '+' : ''}${percDiffValore.toFixed(1)}%)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Valore Medio Contratto</td>
+                        <td style="text-align: center;">€ ${mediaValore1.toLocaleString('it-IT', {minimumFractionDigits: 2})}</td>
+                        <td style="text-align: center;">€ ${mediaValore2.toLocaleString('it-IT', {minimumFractionDigits: 2})}</td>
+                        <td style="text-align: center; font-weight: bold; color: ${mediaValore2 >= mediaValore1 ? '#28a745' : '#dc3545'}">
+                            ${mediaValore2 >= mediaValore1 ? '+' : ''}€ ${(mediaValore2 - mediaValore1).toLocaleString('it-IT', {minimumFractionDigits: 2})}
+                        </td>
+                    </tr>
+                    <tr style="background: #f8f9fa;">
+                        <td>Contratti Stornati</td>
+                        <td style="text-align: center;">${stats1.stornati}</td>
+                        <td style="text-align: center;">${stats2.stornati}</td>
+                        <td style="text-align: center; font-weight: bold; color: ${diffStornati <= 0 ? '#28a745' : '#dc3545'}">
+                            ${diffStornati >= 0 ? '+' : ''}${diffStornati}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Valore Stornati</td>
+                        <td style="text-align: center;">€ ${stats1.valoreStornati.toLocaleString('it-IT', {minimumFractionDigits: 2})}</td>
+                        <td style="text-align: center;">€ ${stats2.valoreStornati.toLocaleString('it-IT', {minimumFractionDigits: 2})}</td>
+                        <td style="text-align: center; font-weight: bold; color: ${stats2.valoreStornati <= stats1.valoreStornati ? '#28a745' : '#dc3545'}">
+                            ${stats2.valoreStornati >= stats1.valoreStornati ? '+' : ''}€ ${(stats2.valoreStornati - stats1.valoreStornati).toLocaleString('it-IT', {minimumFractionDigits: 2})}
+                        </td>
+                    </tr>
+                    <tr style="background: #f8f9fa;">
+                        <td>Prodotti ON LINE</td>
+                        <td style="text-align: center;">${stats1.online}</td>
+                        <td style="text-align: center;">${stats2.online}</td>
+                        <td style="text-align: center; font-weight: bold; color: ${stats2.online >= stats1.online ? '#28a745' : '#dc3545'}">
+                            ${stats2.online >= stats1.online ? '+' : ''}${stats2.online - stats1.online}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Prodotti VIRTUAL</td>
+                        <td style="text-align: center;">${stats1.virtual}</td>
+                        <td style="text-align: center;">${stats2.virtual}</td>
+                        <td style="text-align: center; font-weight: bold; color: ${stats2.virtual >= stats1.virtual ? '#28a745' : '#dc3545'}">
+                            ${stats2.virtual >= stats1.virtual ? '+' : ''}${stats2.virtual - stats1.virtual}
+                        </td>
+                    </tr>
+                `;
+            } catch (error) {
+                console.error('Errore in generaTabellaComparativa:', error);
+            }
+        }
+
+        // Esporta dati
+        function exportData() {
+            try {
+                let csv = 'Mese Produzione;Data Ingresso;Data Ordine;Venditore;Prodotto;Nome;Cognome;Prezzo;Rateizzazione;Num Contratti;';
+                csv += 'Incasso Gen;Incasso Feb;Incasso Mar;Incasso Apr;Incasso Mag;Incasso Giu;';
+                csv += 'Incasso Lug;Incasso Ago;Incasso Set;Incasso Ott;Incasso Nov;Incasso Dic\n';
+                
+                const mesi = ['gennaio', 'febbraio', 'marzo', 'aprile', 'maggio', 'giugno',
+                             'luglio', 'agosto', 'settembre', 'ottobre', 'novembre', 'dicembre'];
+                
+                contracts.forEach(c => {
+                    csv += `${c.meseProduzione};${c.dataIngresso};${c.dataOrdine};${c.venditore};${c.prodotto};`;
+                    csv += `${c.nomeStudente};${c.cognomeStudente};${c.prezzo};${c.rateizzazione};${c.numeroContratti};`;
+                    
+                    mesi.forEach(mese => {
+                        csv += `${c.incassi && c.incassi[mese] ? c.incassi[mese] : ''};`;
+                    });
+                    csv += '\n';
+                });
+
+                const BOM = '\uFEFF';
+                const blob = new Blob([BOM + csv], { type: 'text/csv;charset=utf-8;' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `contratti_pronto_diploma_${new Date().toISOString().split('T')[0]}.csv`;
+                a.click();
+                
+                showNotification('📥 Export completato!');
+            } catch (error) {
+                console.error('Errore in exportData:', error);
+            }
+        }
+
+        // Funzioni per importazione Excel
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            document.getElementById('dropZone').style.background = '#f0f0f0';
+        }
+
+        function handleDragLeave(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            document.getElementById('dropZone').style.background = 'white';
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            document.getElementById('dropZone').style.background = 'white';
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                processExcelFile(files[0]);
+            }
+        }
+
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (file) {
+                processExcelFile(file);
+            }
+        }
+
+        function processExcelFile(file) {
+            try {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const data = e.target.result;
+                        const workbook = XLSX.read(data, {type: 'binary', cellDates: true});
+                        
+                        tempImportData = [];
+                        let totalRows = 0;
+                        const monthMapping = {
+                            'GENNAIO': '01', 'FEBBRAIO': '02', 'MARZO': '03', 'APRILE': '04',
+                            'MAGGIO': '05', 'GIUGNO': '06', 'LUGLIO': '07', 'AGOSTO': '08',
+                            'SETTEMBRE': '09', 'OTTOBRE': '10', 'NOVEMBRE': '11', 'DICEMBRE': '12'
+                        };
+                        
+                        // Processa ogni foglio
+                        workbook.SheetNames.forEach(sheetName => {
+                            const worksheet = workbook.Sheets[sheetName];
+                            const jsonData = XLSX.utils.sheet_to_json(worksheet);
+                            
+                            // Determina mese produzione dal nome foglio
+                            let meseProduzione = '';
+                            const sheetParts = sheetName.toUpperCase().split(' ');
+                            if (sheetParts.length >= 2) {
+                                const monthName = sheetParts[0];
+                                const year = sheetParts[1];
+                                if (monthMapping[monthName] && year) {
+                                    meseProduzione = `${year}-${monthMapping[monthName]}`;
+                                }
+                            }
+                            
+                            // Processa ogni riga
+                            jsonData.forEach(row => {
+                                if (!row['SALES'] || !row['Prezzo']) return; // Salta righe vuote
+                                
+                                // Estrai nome e cognome
+                                let nomeCompleto = row['Membro / Referente'] || '';
+                                let [cognome, nome] = nomeCompleto.split(' ').length > 1 
+                                    ? [nomeCompleto.substring(0, nomeCompleto.lastIndexOf(' ')), nomeCompleto.substring(nomeCompleto.lastIndexOf(' ') + 1)]
+                                    : [nomeCompleto, ''];
+                                
+                                // Converti date
+                                let dataIngresso = '';
+                                let dataOrdine = '';
+                                
+                                if (row['INGRESSO LEAD']) {
+                                    const dateObj = new Date(row['INGRESSO LEAD']);
+                                    if (!isNaN(dateObj)) {
+                                        dataIngresso = dateObj.toISOString().split('T')[0];
+                                    }
+                                }
+                                
+                                if (row['Data ordine']) {
+                                    const dateObj = new Date(row['Data ordine']);
+                                    if (!isNaN(dateObj)) {
+                                        dataOrdine = dateObj.toISOString().split('T')[0];
+                                    }
+                                }
+                                
+                                // Mappa tipo rateizzazione
+                                let rateizzazione = 'Bonifico';
+                                const rateValue = row['Rateizzato'];
+                                if (rateValue) {
+                                    if (rateValue.toString().includes('SELLA')) rateizzazione = 'Banca Sella Prestito al Consumo';
+                                    else if (rateValue.toString().includes('ACCONTO') && rateValue.toString().includes('SELLA')) 
+                                        rateizzazione = 'Acconto + Banca Sella';
+                                    else if (rateValue.toString().includes('ACCONTO')) 
+                                        rateizzazione = 'Acconto + Link To Pay';
+                                    else if (!isNaN(rateValue) && parseInt(rateValue) > 1) 
+                                        rateizzazione = 'Rateizzazione Interna';
+                                }
+                                
+                                // Raccogli incassi mensili
+                                const incassi = {};
+                                const monthNames = [
+                                    'GENNAIO', 'FEBBRAIO', 'MARZO', 'APRILE', 'MAGGIO', 'GIUGNO',
+                                    'LUGLIO', 'AGOSTO', 'SETTEMBRE', 'OTTOBRE', 'NOVEMBRE', 'DICEMBRE'
+                                ];
+                                const monthKeys = [
+                                    'gennaio', 'febbraio', 'marzo', 'aprile', 'maggio', 'giugno',
+                                    'luglio', 'agosto', 'settembre', 'ottobre', 'novembre', 'dicembre'
+                                ];
+                                
+                                monthNames.forEach((month, idx) => {
+                                    const value = row[`INCASSO ${month}`];
+                                    if (value && !isNaN(value) && parseFloat(value) > 0) {
+                                        incassi[monthKeys[idx]] = parseFloat(value);
+                                    }
+                                });
+                                
+                                const contract = {
+                                    meseProduzione: meseProduzione || '2025-01',
+                                    dataIngresso: dataIngresso,
+                                    dataOrdine: dataOrdine,
+                                    venditore: row['SALES'].toString().toUpperCase(),
+                                    prodotto: row['Prodotto'] && row['Prodotto'].toString().toUpperCase().includes('VIRTUAL') ? 'VIRTUAL' : 'ON LINE',
+                                    nomeStudente: nome,
+                                    cognomeStudente: cognome,
+                                    prezzo: parseFloat(row['Prezzo']) || 0,
+                                    rateizzazione: rateizzazione,
+                                    numeroContratti: parseInt(row['N CTR']) || 1,
+                                    incassi: incassi
+                                };
+                                
+                                tempImportData.push(contract);
+                                totalRows++;
+                            });
+                        });
+                        
+                        // Mostra anteprima
+                        showImportPreview(tempImportData, file.name);
+                        
+                    } catch (error) {
+                        alert('❌ Errore nella lettura del file: ' + error.message);
+                        console.error(error);
+                    }
+                };
+                
+                reader.readAsBinaryString(file);
+            } catch (error) {
+                alert('❌ Errore nell\'elaborazione del file');
+                console.error(error);
+            }
+        }
+
+        function showImportPreview(data, filename) {
+            const previewDiv = document.getElementById('importPreview');
+            const previewInfo = document.getElementById('previewInfo');
+            const previewTable = document.getElementById('previewTable');
+            
+            // Info riepilogo
+            const venditoriSet = new Set(data.map(c => c.venditore));
+            const mesiSet = new Set(data.map(c => c.meseProduzione));
+            
+            previewInfo.innerHTML = `
+                <strong>📄 File:</strong> ${filename}<br>
+                <strong>📊 Totale contratti da importare:</strong> ${data.length}<br>
+                <strong>👥 Venditori trovati:</strong> ${venditoriSet.size} (${[...venditoriSet].join(', ')})<br>
+                <strong>📅 Mesi produzione:</strong> ${[...mesiSet].map(m => {
+                    const [year, month] = m.split('-');
+                    const monthNames = ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic'];
+                    return `${monthNames[parseInt(month)-1]} ${year}`;
+                }).join(', ')}
+            `;
+            
+            // Tabella anteprima (primi 10 record)
+            let tableHtml = `
+                <thead>
+                    <tr>
+                        <th>Mese Prod.</th>
+                        <th>Venditore</th>
+                        <th>Studente</th>
+                        <th>Prodotto</th>
+                        <th>Prezzo</th>
+                        <th>Rate</th>
+                    </tr>
+                </thead>
+                <tbody>
+            `;
+            
+            data.slice(0, 10).forEach(c => {
+                const [year, month] = c.meseProduzione.split('-');
+                const monthNames = ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic'];
+                const meseProd = `${monthNames[parseInt(month)-1]} ${year}`;
+                
+                tableHtml += `
+                    <tr>
+                        <td>${meseProd}</td>
+                        <td>${c.venditore}</td>
+                        <td>${c.nomeStudente} ${c.cognomeStudente}</td>
+                        <td>${c.prodotto}</td>
+                        <td>€ ${c.prezzo.toFixed(2)}</td>
+                        <td>${c.rateizzazione}</td>
+                    </tr>
+                `;
+            });
+            
+            if (data.length > 10) {
+                tableHtml += `
+                    <tr>
+                        <td colspan="6" style="text-align: center; font-style: italic; color: #666;">
+                            ... e altri ${data.length - 10} contratti
+                        </td>
+                    </tr>
+                `;
+            }
+            
+            tableHtml += '</tbody>';
+            previewTable.innerHTML = tableHtml;
+            
+            previewDiv.style.display = 'block';
+            document.getElementById('importResults').style.display = 'none';
+        }
+
+        function confirmImport() {
+            try {
+                let importedCount = 0;
+                let skippedCount = 0;
+                
+                // Aggiungi tutti i venditori nuovi
+                const existingVenditori = venditori.map(v => v.nome);
+                const newVenditori = [...new Set(tempImportData.map(c => c.venditore))];
+                
+                newVenditori.forEach(nome => {
+                    if (!existingVenditori.includes(nome)) {
+                        venditori.push({
+                            id: nextVenditoreId++,
+                            nome: nome,
+                            attivo: true
+                        });
+                    }
+                });
+                
+                updateVenditoriSelect();
+                updateVenditoriList();
+                
+                // Importa i contratti
+                tempImportData.forEach(contractData => {
+                    // Verifica duplicati (stesso studente, stesso mese, stesso prezzo)
+                    const isDuplicate = contracts.some(c => 
+                        c.nomeStudente === contractData.nomeStudente &&
+                        c.cognomeStudente === contractData.cognomeStudente &&
+                        c.meseProduzione === contractData.meseProduzione &&
+                        c.prezzo === contractData.prezzo
+                    );
+                    
+                    if (!isDuplicate) {
+                        contracts.push({
+                            ...contractData,
+                            id: nextId++,
+                            timestamp: Date.now()
+                        });
+                        importedCount++;
+                    } else {
+                        skippedCount++;
+                    }
+                });
+                
+                // Mostra risultati
+                const resultsDiv = document.getElementById('importResults');
+                const statsDiv = document.getElementById('importStats');
+                
+                statsDiv.innerHTML = `
+                    <p>✅ <strong>Contratti importati:</strong> ${importedCount}</p>
+                    ${skippedCount > 0 ? `<p>⚠️ <strong>Contratti saltati (duplicati):</strong> ${skippedCount}</p>` : ''}
+                    <p>📊 <strong>Totale contratti nel sistema:</strong> ${contracts.length}</p>
+                `;
+                
+                resultsDiv.style.display = 'block';
+                document.getElementById('importPreview').style.display = 'none';
+                
+                // Resetta input file
+                document.getElementById('excelFile').value = '';
+                tempImportData = [];
+                
+                showNotification(`✅ Importati ${importedCount} contratti!`);
+                
+                // Aggiorna viste
+                if (document.getElementById('contratti').classList.contains('active')) {
+                    loadContracts();
+                }
+                
+            } catch (error) {
+                alert('❌ Errore durante l\'importazione: ' + error.message);
+                console.error(error);
+            }
+        }
+
+        function cancelImport() {
+            document.getElementById('importPreview').style.display = 'none';
+            document.getElementById('excelFile').value = '';
+            tempImportData = [];
+        }
+
+        // Inizializza all'avvio
+        window.onload = function() {
+            try {
+                // Imposta data odierna come default
+                const dataIngresso = document.getElementById('dataIngresso');
+                const dataOrdine = document.getElementById('dataOrdine');
+                
+                if (dataIngresso) dataIngresso.valueAsDate = new Date();
+                if (dataOrdine) dataOrdine.valueAsDate = new Date();
+                
+                // Inizializza venditori
+                initializeDefaultVenditori();
+                
+                // Inizializza filtri
+                initializeFilters();
+            } catch (error) {
+                console.error('Errore in window.onload:', error);
+            }
+        };
+    </script>
+</body>
+</html>
