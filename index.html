@@ -1,266 +1,274 @@
-in updateAnalytics:', error);
-            }
-        }
-        
-        // Calcola statistiche
-        function calcolaStatistiche(contratti) {
-            const validi = contratti.filter(c => !c.stornato);
-            const stornati = contratti.filter(c => c.stornato);
-            
-            return {
-                totaleContratti: validi.reduce((sum, c) => sum + c.numeroContratti, 0),
-                totaleValore: validi.reduce((sum, c) => sum + c.prezzo, 0),
-                online: validi.filter(c => c.prodotto === 'ON LINE').length,
-                virtual: validi.filter(c => c.prodotto === 'VIRTUAL').length,
-                stornati: stornati.length,
-                valoreStornati: stornati.reduce((sum, c) => sum + c.prezzo, 0)
-            };
-        }
-        
-        // Genera tabella comparativa
-        function generaTabellaComparativa(contratti1, contratti2, dal1, al1, dal2, al2, label1, label2) {
-            try {
-                const stats1 = calcolaStatistiche(contratti1);
-                const stats2 = calcolaStatistiche(contratti2);
-                
-                const mediaValore1 = stats1.totaleContratti > 0 ? stats1.totaleValore / stats1.totaleContratti : 0;
-                const mediaValore2 = stats2.totaleContratti > 0 ? stats2.totaleValore / stats2.totaleContratti : 0;
-                
-                const diffContratti = stats2.totaleContratti - stats1.totaleContratti;
-                const percDiffContratti = stats1.totaleContratti > 0 ? (diffContratti / stats1.totaleContratti * 100) : 0;
-                
-                const diffValore = stats2.totaleValore - stats1.totaleValore;
-                const percDiffValore = stats1.totaleValore > 0 ? (diffValore / stats1.totaleValore * 100) : 0;
-                
-                const diffStornati = stats2.stornati - stats1.stornati;
-                
-                const tableBody = document.getElementById('comparisonTableBody');
-                tableBody.innerHTML = `
-                    <tr>
-                        <td>Numero Contratti Validi</td>
-                        <td style="text-align: center;">${stats1.totaleContratti}</td>
-                        <td style="text-align: center;">${stats2.totaleContratti}</td>
-                        <td style="text-align: center; font-weight: bold; color: ${diffContratti >= 0 ? '#28a745' : '#dc3545'}">
-                            ${diffContratti >= 0 ? '+' : ''}${diffContratti} (${percDiffContratti >= 0 ? '+' : ''}${percDiffContratti.toFixed(1)}%)
-                        </td>
-                    </tr>
-                    <tr style="background: #f8f9fa;">
-                        <td>Valore Totale</td>
-                        <td style="text-align: center;">€ ${stats1.totaleValore.toLocaleString('it-IT', {minimumFractionDigits: 2})}</td>
-                        <td style="text-align: center;">€ ${stats2.totaleValore.toLocaleString('it-IT', {minimumFractionDigits: 2})}</td>
-                        <td style="text-align: center; font-weight: bold; color: ${diffValore >= 0 ? '#28a745' : '#dc3545'}">
-                            ${diffValore >= 0 ? '+' : ''}€ ${diffValore.toLocaleString('it-IT', {minimumFractionDigits: 2})} 
-                            (${percDiffValore >= 0 ? '+' : ''}${percDiffValore.toFixed(1)}%)
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Valore Medio Contratto</td>
-                        <td style="text-align: center;">€ ${mediaValore1.toLocaleString('it-IT', {minimumFractionDigits: 2})}</td>
-                        <td style="text-align: center;">€ ${mediaValore2.toLocaleString('it-IT', {minimumFractionDigits: 2})}</td>
-                        <td style="text-align: center; font-weight: bold; color: ${mediaValore2 >= mediaValore1 ? '#28a745' : '#dc3545'}">
-                            ${mediaValore2 >= mediaValore1 ? '+' : ''}€ ${(mediaValore2 - mediaValore1).toLocaleString('it-IT', {minimumFractionDigits: 2})}
-                        </td>
-                    </tr>
-                    <tr style="background: #f8f9fa;">
-                        <td>Contratti Stornati</td>
-                        <td style="text-align: center;">${stats1.stornati}</td>
-                        <td style="text-align: center;">${stats2.stornati}</td>
-                        <td style="text-align: center; font-weight: bold; color: ${diffStornati <= 0 ? '#28a745' : '#dc3545'}">
-                            ${diffStornati >= 0 ? '+' : ''}${diffStornati}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Valore Stornati</td>
-                        <td style="text-align: center;">€ ${stats1.valoreStornati.toLocaleString('it-IT', {minimumFractionDigits: 2})}</td>
-                        <td style="text-align: center;">€ ${stats2.valoreStornati.toLocaleString('it-IT', {minimumFractionDigits: 2})}</td>
-                        <td style="text-align: center; font-weight: bold; color: ${stats2.valoreStornati <= stats1.valoreStornati ? '#28a745' : '#dc3545'}">
-                            ${stats2.valoreStornati >= stats1.valoreStornati ? '+' : ''}€ ${(stats2.valoreStornati - stats1.valoreStornati).toLocaleString('it-IT', {minimumFractionDigits: 2})}
-                        </td>
-                    </tr>
-                    <tr style="background: #f8f9fa;">
-                        <td>Prodotti ON LINE</td>
-                        <td style="text-align: center;">${stats1.online}</td>
-                        <td style="text-align: center;">${stats2.online}</td>
-                        <td style="text-align: center; font-weight: bold; color: ${stats2.online >= stats1.online ? '#28a745' : '#dc3545'}">
-                            ${stats2.online >= stats1.online ? '+' : ''}${stats2.online - stats1.online}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Prodotti VIRTUAL</td>
-                        <td style="text-align: center;">${stats1.virtual}</td>
-                        <td style="text-align: center;">${stats2.virtual}</td>
-                        <td style="text-align: center; font-weight: bold; color: ${stats2.virtual >= stats1.virtual ? '#28a745' : '#dc3545'}">
-                            ${stats2.virtual >= stats1.virtual ? '+' : ''}${stats2.virtual - stats1.virtual}
-                        </td>
-                    </tr>
-                `;
-            } catch (error) {
-                console.error('Errore in generaTabellaComparativa:', error);
-            }
-        }
+<script type="module">
+  // Firebase v9 (Modular)
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+  import { getDatabase, ref, onValue, push, set, update, remove } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js";
 
-        // Esporta dati
-        function exportData() {
-            try {
-                let csv = 'Mese Produzione;Data Ingresso;Data Ordine;Venditore;Prodotto;Nome;Cognome;Prezzo;Rateizzazione;Num Contratti;';
-                csv += 'Incasso Gen;Incasso Feb;Incasso Mar;Incasso Apr;Incasso Mag;Incasso Giu;';
-                csv += 'Incasso Lug;Incasso Ago;Incasso Set;Incasso Ott;Incasso Nov;Incasso Dic\n';
-                
-                const mesi = ['gennaio', 'febbraio', 'marzo', 'aprile', 'maggio', 'giugno',
-                             'luglio', 'agosto', 'settembre', 'ottobre', 'novembre', 'dicembre'];
-                
-                contracts.forEach(c => {
-                    csv += `${c.meseProduzione};${c.dataIngresso};${c.dataOrdine};${c.venditore};${c.prodotto};`;
-                    csv += `${c.nomeStudente};${c.cognomeStudente};${c.prezzo};${c.rateizzazione};${c.numeroContratti};`;
-                    
-                    mesi.forEach(mese => {
-                        csv += `${c.incassi && c.incassi[mese] ? c.incassi[mese] : ''};`;
-                    });
-                    csv += '\n';
-                });
+  // --- CONFIG FIREBASE (fornita) ---
+  const firebaseConfig = {
+    apiKey: "AIzaSyAKAs06_n8t19KH5CxMGisxZGM1Q5kpiU0",
+    authDomain: "pronto-diploma.firebaseapp.com",
+    databaseURL: "https://pronto-diploma-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "pronto-diploma",
+    storageBucket: "pronto-diploma.firebasestorage.app",
+    messagingSenderId: "640164355453",
+    appId: "1:640164355453:web:7c79a591af4869c54f4014"
+  };
 
-                const BOM = '\uFEFF';
-                const blob = new Blob([BOM + csv], { type: 'text/csv;charset=utf-8;' });
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `contratti_pronto_diploma_${new Date().toISOString().split('T')[0]}.csv`;
-                a.click();
-                
-                showNotification('📥 Export completato!');
-            } catch (error) {
-                console.error('Errore in exportData:', error);
-            }
-        }
+  const app = initializeApp(firebaseConfig);
+  const db  = getDatabase(app);
 
-        // Funzioni per importazione Excel (le stesse del codice originale ma con Firebase)
-        function handleDragOver(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            document.getElementById('dropZone').style.background = '#f0f0f0';
-        }
+  // Mappe chiavi Firebase -> ID numerici locali usati dal v2.1
+  const contractIdMap  = new Map();   // id numerico -> firebaseKey
+  const venditoreKeyByName = new Map(); // nome -> firebaseKey
 
-        function handleDragLeave(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            document.getElementById('dropZone').style.background = 'white';
-        }
+  // Utility: normalizza incassi in minuscolo
+  function normalizeIncassi(incassi = {}) {
+    const out = {};
+    Object.entries(incassi).forEach(([k,v]) => {
+      if (!v || isNaN(+v)) return;
+      out[String(k).toLowerCase()] = Number(v);
+    });
+    return out;
+  }
 
-        function handleDrop(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            document.getElementById('dropZone').style.background = 'white';
-            
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                processExcelFile(files[0]);
-            }
-        }
+  // --- SYNC REALTIME: VENDITORI ---
+  onValue(ref(db, 'venditori'), (snap) => {
+    const data = snap.val() || {};
+    // ricostruisce array globale 'venditori' del v2.1 (stesso nome/forma)
+    window.venditori = [];
+    venditoreKeyByName.clear();
+    let autoId = 1;
+    Object.entries(data).forEach(([key, v]) => {
+      const attivo = v?.attivo !== false;
+      const nome   = (v?.nome || '').toUpperCase();
+      if (!nome) return;
+      window.venditori.push({ id: autoId++, nome, attivo });
+      venditoreKeyByName.set(nome, key);
+    });
+    // aggiorna UI come nel v2.1
+    if (window.updateVenditoriSelect) window.updateVenditoriSelect();
+    if (window.updateVenditoriList)  window.updateVenditoriList();
+  });
 
-        function handleFileSelect(e) {
-            const file = e.target.files[0];
-            if (file) {
-                processExcelFile(file);
-            }
-        }
+  // --- SYNC REALTIME: CONTRACTS ---
+  onValue(ref(db, 'contracts'), (snap) => {
+    const data = snap.val() || {};
+    window.contracts = [];
+    contractIdMap.clear();
+    let autoId = 1;
 
-        function processExcelFile(file) {
-            // [Il codice di processamento Excel rimane lo stesso]
-            // ...
-        }
+    Object.entries(data).forEach(([key, c]) => {
+      const obj = {
+        // campi originali del v2.1
+        id: autoId++,
+        meseProduzione: c?.meseProduzione || '',
+        dataIngresso:   c?.dataIngresso   || '',
+        dataOrdine:     c?.dataOrdine     || '',
+        venditore:      (c?.venditore || '').toUpperCase(),
+        prodotto:       c?.prodotto || '',
+        nomeStudente:   c?.nomeStudente || '',
+        cognomeStudente:c?.cognomeStudente || '',
+        prezzo:         Number(c?.prezzo || 0),
+        rateizzazione:  c?.rateizzazione || 'Bonifico',
+        numeroContratti:parseInt(c?.numeroContratti || 1),
+        incassi:        normalizeIncassi(c?.incassi),
+        stornato:       !!c?.stornato,
+        dataStorno:     c?.dataStorno || '',
+        timestamp:      c?.timestamp || Date.now()
+      };
+      window.contracts.push(obj);
+      contractIdMap.set(obj.id, key);
+    });
 
-        function showImportPreview(data, filename) {
-            // [Il codice di preview rimane lo stesso]
-            // ...
-        }
+    // Aggiorna viste esistenti del v2.1
+    const tabContrattiAttivo = document.getElementById('contratti')?.classList.contains('active');
+    const tabReportAttivo    = document.getElementById('report')?.classList.contains('active');
+    if (tabContrattiAttivo && window.loadContracts) window.loadContracts();
+    if (tabReportAttivo && window.updateDashboard)  window.updateDashboard();
+  });
 
-        async function confirmImport() {
-            try {
-                let importedCount = 0;
-                let skippedCount = 0;
-                
-                updateSyncIndicator('syncing');
-                
-                // Aggiungi venditori nuovi
-                const existingVenditori = venditori.map(v => v.nome);
-                const newVenditori = [...new Set(tempImportData.map(c => c.venditore))];
-                
-                for (const nome of newVenditori) {
-                    if (!existingVenditori.includes(nome)) {
-                        await database.ref('venditori').push({
-                            nome: nome,
-                            attivo: true,
-                            timestamp: Date.now()
-                        });
-                    }
-                }
-                
-                // Importa contratti
-                for (const contractData of tempImportData) {
-                    const isDuplicate = contracts.some(c => 
-                        c.nomeStudente === contractData.nomeStudente &&
-                        c.cognomeStudente === contractData.cognomeStudente &&
-                        c.meseProduzione === contractData.meseProduzione &&
-                        c.prezzo === contractData.prezzo
-                    );
-                    
-                    if (!isDuplicate) {
-                        await database.ref('contracts').push({
-                            ...contractData,
-                            timestamp: Date.now()
-                        });
-                        importedCount++;
-                    } else {
-                        skippedCount++;
-                    }
-                }
-                
-                // Mostra risultati
-                const resultsDiv = document.getElementById('importResults');
-                const statsDiv = document.getElementById('importStats');
-                
-                statsDiv.innerHTML = `
-                    <p>✅ <strong>Contratti importati:</strong> ${importedCount}</p>
-                    ${skippedCount > 0 ? `<p>⚠️ <strong>Contratti saltati (duplicati):</strong> ${skippedCount}</p>` : ''}
-                    <p>📊 <strong>Totale contratti nel sistema:</strong> ${contracts.length + importedCount}</p>
-                `;
-                
-                resultsDiv.style.display = 'block';
-                document.getElementById('importPreview').style.display = 'none';
-                
-                document.getElementById('excelFile').value = '';
-                tempImportData = [];
-                
-                showNotification(`✅ Importati ${importedCount} contratti!`);
-                updateSyncIndicator('synced');
-                
-            } catch (error) {
-                alert('❌ Errore durante l\'importazione: ' + error.message);
-                console.error(error);
-                updateSyncIndicator('offline');
-            }
-        }
+  // --- OVERRIDE FUNZIONI v2.1 -> Firebase ---
 
-        function cancelImport() {
-            document.getElementById('importPreview').style.display = 'none';
-            document.getElementById('excelFile').value = '';
-            tempImportData = [];
-        }
+  // 1) Aggiunta venditore
+  window.aggiungiVenditore = async function () {
+    const input = document.getElementById('nuovoVenditore');
+    const nome = (input?.value || '').trim().toUpperCase();
+    if (!nome) { alert('⚠️ Inserisci il nome del venditore'); return; }
+    if (window.venditori?.some(v => v.attivo && v.nome === nome)) {
+      alert('⚠️ Questo venditore esiste già'); return;
+    }
+    await set(push(ref(db, 'venditori')), { nome, attivo: true, createdAt: Date.now() });
+    input.value = '';
+    if (window.showNotification) window.showNotification('✅ Venditore aggiunto');
+  };
 
-        // Inizializza all'avvio
-        window.onload = function() {
-            try {
-                const dataIngresso = document.getElementById('dataIngresso');
-                const dataOrdine = document.getElementById('dataOrdine');
-                
-                if (dataIngresso) dataIngresso.valueAsDate = new Date();
-                if (dataOrdine) dataOrdine.valueAsDate = new Date();
-                
-                initializeFilters();
-            } catch (error) {
-                console.error('Errore in window.onload:', error);
-            }
+  // 2) Rimozione venditore (set attivo:false)
+  window.rimuoviVenditore = async function (id) {
+    try {
+      if (!confirm('⚠️ Vuoi rimuovere questo venditore?')) return;
+      const vend = window.venditori?.find(v => v.id === id);
+      if (!vend) return;
+      const key = venditoreKeyByName.get(vend.nome);
+      if (!key) return;
+      await update(ref(db, `venditori/${key}`), { attivo: false });
+      if (window.showNotification) window.showNotification('✅ Venditore rimosso');
+    } catch (e) {
+      console.error(e); alert('Errore rimozione venditore');
+    }
+  };
+
+  // 3) Eliminazione contratto
+  window.deleteContract = async function (id) {
+    try {
+      if (!confirm('⚠️ Sei sicuro di voler eliminare definitivamente questo contratto?')) return;
+      const key = contractIdMap.get(id);
+      if (!key) return;
+      await remove(ref(db, `contracts/${key}`));
+      if (window.showNotification) window.showNotification('✅ Contratto eliminato');
+    } catch (e) {
+      console.error(e); alert('Errore eliminazione contratto');
+    }
+  };
+
+  // 4) Storno contratto
+  window.stornaContract = async function (id) {
+    try {
+      if (!confirm('⚠️ Vuoi stornare questo contratto? Il contratto verrà segnato come STORNATO e non verrà più conteggiato nelle statistiche.')) return;
+      const key = contractIdMap.get(id);
+      if (!key) return;
+      const today = new Date().toISOString().split('T')[0];
+      await update(ref(db, `contracts/${key}`), { stornato: true, dataStorno: today });
+      if (window.showNotification) window.showNotification('⚠️ Contratto stornato');
+    } catch (e) {
+      console.error(e); alert('Errore storno contratto');
+    }
+  };
+
+  // 5) Intercetta SUBMIT form contratti (scrive su Firebase, non in locale)
+  (function interceptSubmit() {
+    const form = document.getElementById('contractForm');
+    if (!form) return;
+    form.addEventListener('submit', async function (e) {
+      // cattura, blocca il listener originale del v2.1
+      e.preventDefault();
+      e.stopImmediatePropagation();
+
+      const btn = document.getElementById('saveBtn');
+      if (btn) { btn.disabled = true; btn.textContent = '⏳ Salvataggio...'; }
+
+      try {
+        const mesi = ['gennaio','febbraio','marzo','aprile','maggio','giugno','luglio','agosto','settembre','ottobre','novembre','dicembre'];
+        const incassi = {};
+        mesi.forEach((m) => {
+          const el = document.getElementById('incasso' + m.charAt(0).toUpperCase() + m.slice(1));
+          const val = el ? parseFloat(String(el.value).replace(',','.')) || 0 : 0;
+          if (val > 0) incassi[m] = val;
+        });
+
+        const contract = {
+          meseProduzione: document.getElementById('meseProduzione').value,
+          dataIngresso:   document.getElementById('dataIngresso').value,
+          dataOrdine:     document.getElementById('dataOrdine').value,
+          venditore:      document.getElementById('venditore').value.toUpperCase(),
+          prodotto:       document.getElementById('prodotto').value,
+          nomeStudente:   document.getElementById('nomeStudente').value.trim(),
+          cognomeStudente:document.getElementById('cognomeStudente').value.trim(),
+          prezzo:         parseFloat(document.getElementById('prezzo').value),
+          rateizzazione:  document.getElementById('rateizzazione').value,
+          numeroContratti:parseInt(document.getElementById('numeroContratti').value || '1'),
+          incassi,
+          stornato:false,
+          timestamp: Date.now()
         };
-    </script>
-</body>
-</html>
+
+        // Validazioni base (come v2.1)
+        if (!contract.meseProduzione || !contract.dataIngresso || !contract.dataOrdine ||
+            !contract.venditore || !contract.prodotto || !contract.nomeStudente || !contract.cognomeStudente ||
+            isNaN(contract.prezzo)) {
+          alert('Compila tutti i campi obbligatori');
+          if (btn) { btn.disabled = false; btn.textContent = '✅ Salva Contratto'; }
+          return;
+        }
+
+        await set(push(ref(db, 'contracts')), contract);
+
+        if (window.showNotification) window.showNotification('✅ Contratto salvato con successo!');
+        form.reset();
+        // reimposta date default
+        const now = new Date();
+        document.getElementById('dataIngresso').valueAsDate = now;
+        document.getElementById('dataOrdine').valueAsDate   = now;
+        document.getElementById('numeroContratti').value    = 1;
+
+      } catch (error) {
+        console.error(error);
+        alert('Errore nel salvataggio');
+      } finally {
+        if (btn) { btn.disabled = false; btn.textContent = '✅ Salva Contratto'; }
+      }
+    }, true); // <— capture: blocca il listener originale
+  })();
+
+  // 6) Import Excel: salva su Firebase, non in locale
+  window.confirmImport = async function () {
+    try {
+      if (!Array.isArray(window.tempImportData) || window.tempImportData.length === 0) {
+        alert('Nessun dato da importare'); return;
+      }
+      let imported = 0, skipped = 0;
+
+      // Aggiungi venditori mancanti
+      const esistenti = new Set((window.venditori || []).filter(v => v.attivo).map(v => v.nome));
+      const richiesti  = new Set(window.tempImportData.map(c => (c.venditore || '').toUpperCase()).filter(Boolean));
+      for (const nome of richiesti) {
+        if (!esistenti.has(nome)) {
+          await set(push(ref(db, 'venditori')), { nome, attivo: true, createdAt: Date.now() });
+          esistenti.add(nome);
+        }
+      }
+
+      // Import contratti (evita duplicati base)
+      for (const c of window.tempImportData) {
+        const contratto = {
+          ...c,
+          venditore: (c.venditore || '').toUpperCase(),
+          prezzo: Number(c.prezzo || 0),
+          numeroContratti: parseInt(c.numeroContratti || 1),
+          incassi: normalizeIncassi(c.incassi),
+          stornato: false,
+          timestamp: Date.now()
+        };
+        // duplicate check lato client (stesso studente+mese+prezzo)
+        const dup = (window.contracts || []).some(x =>
+          x.nomeStudente   === contratto.nomeStudente &&
+          x.cognomeStudente=== contratto.cognomeStudente &&
+          x.meseProduzione === contratto.meseProduzione &&
+          Number(x.prezzo) === Number(contratto.prezzo)
+        );
+        if (dup) { skipped++; continue; }
+        await set(push(ref(db, 'contracts')), contratto);
+        imported++;
+      }
+
+      // UI risultati (come v2.1)
+      const statsDiv = document.getElementById('importStats');
+      const resDiv   = document.getElementById('importResults');
+      if (statsDiv) {
+        statsDiv.innerHTML = `
+          <p>✅ <strong>Contratti importati:</strong> ${imported}</p>
+          ${skipped ? `<p>⚠️ <strong>Contratti saltati (duplicati):</strong> ${skipped}</p>` : ''}
+          <p>📊 <strong>Totale contratti nel sistema:</strong> ${(window.contracts||[]).length}</p>
+        `;
+      }
+      if (resDiv) resDiv.style.display = 'block';
+      const prev = document.getElementById('importPreview');
+      if (prev) prev.style.display = 'none';
+      const file = document.getElementById('excelFile'); if (file) file.value = '';
+      window.tempImportData = [];
+      if (window.showNotification) window.showNotification(`✅ Importati ${imported} contratti!`);
+      if (document.getElementById('contratti')?.classList.contains('active') && window.loadContracts) window.loadContracts();
+    } catch (e) {
+      console.error(e); alert('❌ Errore durante l\'importazione');
+    }
+  };
+</script>
