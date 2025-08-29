@@ -545,6 +545,9 @@
             }
         }
     </style>
+    <!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 </head>
 <body>
     <!-- Login Screen -->
@@ -1016,25 +1019,22 @@
     <!-- SheetJS per leggere Excel -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
-    <!-- Firebase SDK (compat) -->
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-<script>
-  const firebaseConfig = {
+    <script>
+        // Database locale in memoria
+        // Configurazione Firebase
+const firebaseConfig = {
     apiKey: "AIzaSyAKAs06_n8t19KH5CxMGisxZGM1Q5kpiU0",
     authDomain: "pronto-diploma.firebaseapp.com",
-    databaseURL: "https://pronto-diploma-default-rtdb.europe-west1.firebasestorage.app",
+    databaseURL: "https://pronto-diploma-default-rtdb.europe-west1.firebasedatabase.app",
     projectId: "pronto-diploma",
     storageBucket: "pronto-diploma.firebasestorage.app",
     messagingSenderId: "640164355453",
     appId: "1:640164355453:web:7c79a591af4869c54f4014"
-  };
-  const app = firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
-</script>
-    
-    <script>
-        // Database locale in memoria
+};
+
+// Inizializza Firebase
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
         let contracts = [];
         let venditori = [];
         let nextId = 1;
